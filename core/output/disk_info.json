@@ -1,0 +1,56 @@
+{
+  "disks": [
+    {
+      "name": "PhysicalDrive0",
+      "vendor": "NVMe",
+      "model": "KBG50ZNT512G LS KIOXIA",
+      "serial": "8CE3_8E10_007D_EECE.",
+      "protocol": "NVME",
+      "size_gb": 476.94,
+      "volumes": [
+        {
+          "letter": "C:/",
+          "label": "Windows-SSD",
+          "filesystem": "NTFS",
+          "size_gb": 474.71,
+          "free_gb": 52.59,
+          "offset": 290455552
+        },
+        {
+          "letter": "",
+          "label": "WINRE_DRV",
+          "filesystem": "NTFS",
+          "size_gb": 0.00,
+          "free_gb": 0.00,
+          "offset": 510012686336
+        },
+        {
+          "letter": "",
+          "label": "SYSTEM_DRV",
+          "filesystem": "FAT32",
+          "size_gb": 0.00,
+          "free_gb": 0.00,
+          "offset": 1048576
+        }
+      ]
+    },
+    {
+      "name": "PhysicalDrive1",
+      "vendor": " USB",
+      "model": " SanDisk 3.2Gen1",
+      "serial": "0901272b139b28742a7c",
+      "protocol": "USB",
+      "size_gb": 57.71,
+      "volumes": [
+        {
+          "letter": "E:/",
+          "label": "FAT32",
+          "filesystem": "FAT32",
+          "size_gb": 57.70,
+          "free_gb": 57.70,
+          "offset": 1048576
+        }
+      ]
+    }
+  ]
+}
