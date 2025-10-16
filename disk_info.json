@@ -1,0 +1,70 @@
+{
+  "disks": [
+    {
+      "name": "PHYSICALDRIVE2",
+      "vendor": "USB",
+      "model": "USB  SanDisk 3.2Gen1 USB Device",
+      "serial": "0901272b139b28742a7c",
+      "protocol": "USB",
+      "size_gb": 57.71,
+      "path": "\\\\.\\PHYSICALDRIVE2",
+      "index": 0,
+      "volumes": [
+        {
+          "letter": "E:",
+          "label": "FAT32",
+          "filesystem": "FAT32",
+          "size_gb": 57.7,
+          "free_gb": 57.7,
+          "offset": 1048576,
+          "path": "\\\\.\\E",
+          "partition_index": 0
+        }
+      ]
+    },
+    {
+      "name": "PHYSICALDRIVE1",
+      "vendor": "WDC",
+      "model": "WDC WD16 00BEVT-80A23T0 SCSI Disk Device",
+      "serial": "DD564198838A3",
+      "protocol": "USB",
+      "size_gb": 149.05,
+      "path": "\\\\.\\PHYSICALDRIVE1",
+      "index": 1,
+      "volumes": [
+        {
+          "letter": "D:",
+          "label": "",
+          "filesystem": "",
+          "size_gb": 0.0,
+          "free_gb": 0.0,
+          "offset": 1048576,
+          "path": "\\\\.\\D",
+          "partition_index": 0
+        }
+      ]
+    },
+    {
+      "name": "PHYSICALDRIVE0",
+      "vendor": "NVME",
+      "model": "NVMe KBG50ZNT512G LS KIOXIA",
+      "serial": "8CE3_8E10_007D_EECE.",
+      "protocol": "NVMe",
+      "size_gb": 476.94,
+      "path": "\\\\.\\PHYSICALDRIVE0",
+      "index": 2,
+      "volumes": [
+        {
+          "letter": "C:",
+          "label": "Windows-SSD",
+          "filesystem": "NTFS",
+          "size_gb": 474.71,
+          "free_gb": 49.41,
+          "offset": 290455552,
+          "path": "\\\\.\\C",
+          "partition_index": 1
+        }
+      ]
+    }
+  ]
+}

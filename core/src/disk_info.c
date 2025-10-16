@@ -48,27 +48,27 @@ const char* GetBusTypeString(STORAGE_BUS_TYPE busType) {
     }
 }
 
-void PrintDiskInfo(const DiskInfo* d) {
-    printf("=================================================================\n");
-    printf("O DIA: %s\n", d->physical_name);
-    printf("-----------------------------------------------------------------\n");
-    printf("  - Vendor         : %s\n", strlen(d->vendor) ? d->vendor : "N/A");
-    printf("  - Model          : %s\n", strlen(d->model) ? d->model : "N/A");
-    printf("  - Serial         : %s\n", strlen(d->serial_number) ? d->serial_number : "N/A");
-    printf("  - Protocol       : %s\n", d->protocol);
-    printf("  - Tong dung luong: %.2f GB (%llu bytes)\n", d->size_gb, d->total_size);
-    printf("  - Tong dung luong trong: %.2f GB (%llu bytes)\n", (double)d->free_space / (1024 * 1024 * 1024), d->free_space);
-    printf("  - Cac phan vung (%d):\n", d->volume_count);
-    for (int i = 0; i < d->volume_count; i++) {
-        const VolumeInfo* v = &d->volumes[i];
-        printf("    -> %-5s | %-12s | FS: %-8s | Size: %6.2f GB | Free: %6.2f GB | Offset: %llu\n",
-               strlen(v->volume_letter) ? v->volume_letter : "[-]",
-               v->label, v->filesystem,
-               v->size_gb, (double)v->free_space / (1024 * 1024 * 1024),
-               v->offset_bytes);
-    }
-    printf("=================================================================\n\n");
-}
+// void PrintDiskInfo(const DiskInfo* d) {
+//     printf("=================================================================\n");
+//     printf("O DIA: %s\n", d->physical_name);
+//     printf("-----------------------------------------------------------------\n");
+//     printf("  - Vendor         : %s\n", strlen(d->vendor) ? d->vendor : "N/A");
+//     printf("  - Model          : %s\n", strlen(d->model) ? d->model : "N/A");
+//     printf("  - Serial         : %s\n", strlen(d->serial_number) ? d->serial_number : "N/A");
+//     printf("  - Protocol       : %s\n", d->protocol);
+//     printf("  - Tong dung luong: %.2f GB (%llu bytes)\n", d->size_gb, d->total_size);
+//     printf("  - Tong dung luong trong: %.2f GB (%llu bytes)\n", (double)d->free_space / (1024 * 1024 * 1024), d->free_space);
+//     printf("  - Cac phan vung (%d):\n", d->volume_count);
+//     for (int i = 0; i < d->volume_count; i++) {
+//         const VolumeInfo* v = &d->volumes[i];
+//         printf("    -> %-5s | %-12s | FS: %-8s | Size: %6.2f GB | Free: %6.2f GB | Offset: %llu\n",
+//                strlen(v->volume_letter) ? v->volume_letter : "[-]",
+//                v->label, v->filesystem,
+//                v->size_gb, (double)v->free_space / (1024 * 1024 * 1024),
+//                v->offset_bytes);
+//     }
+//     printf("=================================================================\n\n");
+// }
 
 void ExportToJson(DiskInfo* disks, int disk_count, const char* path) {
     FILE* f = fopen(path, "w");
@@ -225,4 +225,3 @@ int main() {
     printf("Quet hoan tat.\n");
     return 0;
 }
-

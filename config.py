@@ -4,10 +4,7 @@ import os
 
 # --- CẤU HÌNH ĐƯỜNG DẪN DỮ LIỆU ---
 # Thay thế bằng đường dẫn thực tế của bạn
-JSON_PATH = r"C:\NLN\code\Machine-Learning-Forensic-Application\core\output\disk_info.json"
-# Đường dẫn đến file thực thi C/Core để quét ổ đĩa
-C_BIN_DIR = r"c:\NLN\code\Machine-Learning-Forensic-Application\core\src"
-DISK_INFO_EXECUTABLE = os.path.join(C_BIN_DIR, "disk_info.exe") 
+JSON_PATH = r"C:\NLN\code\Machine-Learning-Forensic-Application\disk_info.json"
 # --- TIÊU ĐỀ BẢNG VÀ MENU ---
 TREE_HEADERS = ["Tên thiết bị / Phân vùng", "Loại", "Kết nối / FS", "Dung lượng"]
 MENU_ITEMS = ["🏠  Home", "🔍  Quét dữ liệu", "📋  Phiên làm việc"]
