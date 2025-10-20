@@ -153,4 +153,14 @@ def get_app_stylesheet():
         background-color: #f1f4f8;
         border-left: 1px solid #c5c9cf;
     }
+    #detailContent {
+        border: 1px solid #ccc;
+        background-color: #fafafa;
+        padding: 3px 6px;
+        font-size: 13px;
+        line-height: 1.3;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        margin-top: 0;
+    }
     """

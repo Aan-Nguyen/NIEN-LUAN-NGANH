@@ -3,6 +3,16 @@ import wmi
 import json
 import re
 
+def format_size(bytes_size):
+    if bytes_size is None:
+        return "0 B"
+    size = float(bytes_size)
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if size < 1024:
+            return f"{size:.2f} {unit}"
+        size /= 1024
+    return f"{size:.2f} PB"
+
 def extract_vendor(model):
     if not model:
         return "Unknown"
@@ -30,37 +40,41 @@ def get_disk_info():
     disks = []
 
     for d_index, disk in enumerate(c.Win32_DiskDrive()):
-        disk_name = disk.DeviceID.split("\\")[-1]  # Ví dụ: PhysicalDrive0
+        disk_name = disk.DeviceID.split("\\")[-1]
         model = disk.Model or "Unknown"
         vendor = extract_vendor(model)
         serial = getattr(disk, "SerialNumber", "").strip()
         protocol = get_protocol(disk)
-        size_gb = round(int(disk.Size) / (1024**3), 2) if disk.Size else 0.0
+        size_bytes = int(disk.Size) if disk.Size else 0
 
         volumes = []
-        for p_index, partition in enumerate(disk.associators("Win32_DiskDriveToDiskPartition")):
-            for logical in partition.associators("Win32_LogicalDiskToPartition"):
-                path = f"\\\\.\\{logical.DeviceID.replace(':', '')}"  # \\.\C:
-                letter = logical.DeviceID.replace("\\", "/")
+        raw_path_disk = ""
+        for partition in disk.associators("Win32_DiskDriveToDiskPartition"):
+            try:
+                part_index = int(getattr(partition, "Index", -1))
+            except Exception:
+                part_index = -1
 
-                # Xử lý lỗi PermissionError
+            for logical in partition.associators("Win32_LogicalDiskToPartition"):
+                drive_letter = logical.DeviceID
+                usage = None
                 try:
-                    usage = psutil.disk_usage(logical.DeviceID + "\\")
-                    total = round(usage.total / (1024**3), 2)
-                    free = round(usage.free / (1024**3), 2)
+                    usage = psutil.disk_usage(drive_letter + "\\")
                 except (PermissionError, FileNotFoundError, OSError):
-                    total = 0.0
-                    free = 0.0
+                    usage = None
+
+                raw_path = f"\\\\.\\{drive_letter}"
+                raw_path_disk = raw_path if not raw_path_disk else raw_path_disk
 
                 volumes.append({
-                    "letter": letter,
+                    "letter": drive_letter.replace("\\", "/"),
                     "label": logical.VolumeName or "",
                     "filesystem": logical.FileSystem or "",
-                    "size_gb": total,
-                    "free_gb": free,
-                    "offset": int(partition.StartingOffset),
-                    "path": path,
-                    "partition_index": p_index
+                    "size": format_size(usage.total) if usage else "0 B",
+                    "free": format_size(usage.free) if usage else "0 B",
+                    "offset": int(getattr(partition, "StartingOffset", 0)),
+                    "path": raw_path,
+                    "partition_index": part_index
                 })
 
         disks.append({
@@ -69,8 +83,8 @@ def get_disk_info():
             "model": model.strip(),
             "serial": serial,
             "protocol": protocol.strip(),
-            "size_gb": size_gb,
-            "path": f"\\\\.\\{disk_name}",   # thêm path cho ổ đĩa
+            "size": format_size(size_bytes),
+            "path": raw_path_disk,
             "index": d_index,
             "volumes": volumes
         })
@@ -79,7 +93,6 @@ def get_disk_info():
 
 if __name__ == "__main__":
     info = get_disk_info()
-
     with open("disk_info.json", "w", encoding="utf-8") as f:
         json.dump(info, f, indent=2, ensure_ascii=False)
 

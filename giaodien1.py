@@ -2,7 +2,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QPixmap
-import sys, json, os
+import sys, json, os, subprocess
 from styles import get_app_stylesheet
 from config import JSON_PATH, TREE_HEADERS, MENU_ITEMS, IMAGE_PATH_INTERNAL, IMAGE_PATH_USB, IMAGE_PATH_PARTITION
 
@@ -33,7 +33,12 @@ class RecoverApp(QWidget):
         menu.setFixedWidth(200)
         for name in MENU_ITEMS: menu.addItem(QListWidgetItem(name))
         sidebar_layout.addWidget(menu)
-
+         # Home button
+        home_btn = QPushButton("🏠 Home")
+        home_btn.clicked.connect(self.go_home)
+        sidebar_layout.addWidget(home_btn)
+        
+    
         sidebar = QFrame()
         sidebar.setLayout(sidebar_layout)
         sidebar.setFixedWidth(220)
@@ -79,6 +84,11 @@ class RecoverApp(QWidget):
         main_layout.addLayout(content_layout)
         main_layout.addWidget(right_panel)
 
+# ===================== Chuyển về Home =====================
+    def go_home(self):
+        self.show()  # Hiển thị lại Home
+        if hasattr(self, "next_window") and self.next_window.isVisible():
+            self.next_window.close()  # Đóng giao diện quét nếu đang mở
     # ===================== Lấy phân vùng/ổ đang chọn =====================
     def get_selected_disk_info(self):
         item = self.tree.currentItem()
@@ -143,14 +153,14 @@ class RecoverApp(QWidget):
     def populate_tree(self):
         for i,disk in enumerate(self.disk_data.get("disks",[])):
             disk_item = QTreeWidgetItem([f"🖴 {disk.get('model','Unknown')}", "Hardware Disk",
-                                         disk.get("protocol","N/A"), f"{disk.get('size_gb',0):.2f} GB"])
+                                         disk.get("protocol","N/A"), f"{disk.get('size_str', disk.get('size',0))}"])
             disk_item.setData(0,Qt.UserRole,{"type":"disk","index":i})
             self.tree.addTopLevelItem(disk_item)
             for j,vol in enumerate(disk.get("volumes",[])):
                 name,letter = vol.get("label","Không có tên"), vol.get("letter","")
                 display_name = f"{name} ({letter})" if letter else name
                 vol_item = QTreeWidgetItem([f"   📂 {display_name}","Logical Volume",
-                                            vol.get("filesystem","N/A"),f"{vol.get('size_gb',0):.2f} GB"])
+                                            vol.get("filesystem","N/A"),f"{vol.get('size_str', vol.get('size',0))}"])
                 vol_item.setData(0,Qt.UserRole,{"type":"volume","disk_index":i,"vol_index":j})
                 disk_item.addChild(vol_item)
         self.tree.expandAll()

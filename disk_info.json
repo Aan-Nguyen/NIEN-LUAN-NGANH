@@ -1,46 +1,56 @@
 {
   "disks": [
     {
-      "name": "PHYSICALDRIVE2",
+      "name": "PHYSICALDRIVE1",
       "vendor": "USB",
       "model": "USB  SanDisk 3.2Gen1 USB Device",
       "serial": "0901272b139b28742a7c",
       "protocol": "USB",
-      "size_gb": 57.71,
-      "path": "\\\\.\\PHYSICALDRIVE2",
+      "size": "57.71 GB",
+      "path": "\\\\.\\F:",
       "index": 0,
       "volumes": [
         {
-          "letter": "E:",
+          "letter": "F:",
           "label": "FAT32",
           "filesystem": "FAT32",
-          "size_gb": 57.7,
-          "free_gb": 57.7,
+          "size": "57.70 GB",
+          "free": "57.70 GB",
           "offset": 1048576,
-          "path": "\\\\.\\E",
+          "path": "\\\\.\\F:",
           "partition_index": 0
         }
       ]
     },
     {
-      "name": "PHYSICALDRIVE1",
+      "name": "PHYSICALDRIVE2",
       "vendor": "WDC",
       "model": "WDC WD16 00BEVT-80A23T0 SCSI Disk Device",
       "serial": "DD564198838A3",
       "protocol": "USB",
-      "size_gb": 149.05,
-      "path": "\\\\.\\PHYSICALDRIVE1",
+      "size": "149.05 GB",
+      "path": "\\\\.\\D:",
       "index": 1,
       "volumes": [
         {
           "letter": "D:",
-          "label": "",
-          "filesystem": "",
-          "size_gb": 0.0,
-          "free_gb": 0.0,
+          "label": "New Volume",
+          "filesystem": "NTFS",
+          "size": "12.82 GB",
+          "free": "12.77 GB",
           "offset": 1048576,
-          "path": "\\\\.\\D",
+          "path": "\\\\.\\D:",
           "partition_index": 0
+        },
+        {
+          "letter": "E:",
+          "label": "New Volume",
+          "filesystem": "NTFS",
+          "size": "136.23 GB",
+          "free": "136.14 GB",
+          "offset": 13761511424,
+          "path": "\\\\.\\E:",
+          "partition_index": 1
         }
       ]
     },
@@ -50,18 +60,18 @@
       "model": "NVMe KBG50ZNT512G LS KIOXIA",
       "serial": "8CE3_8E10_007D_EECE.",
       "protocol": "NVMe",
-      "size_gb": 476.94,
-      "path": "\\\\.\\PHYSICALDRIVE0",
+      "size": "476.94 GB",
+      "path": "\\\\.\\C:",
       "index": 2,
       "volumes": [
         {
           "letter": "C:",
           "label": "Windows-SSD",
           "filesystem": "NTFS",
-          "size_gb": 474.71,
-          "free_gb": 49.41,
+          "size": "474.71 GB",
+          "free": "50.51 GB",
           "offset": 290455552,
-          "path": "\\\\.\\C",
+          "path": "\\\\.\\C:",
           "partition_index": 1
         }
       ]
