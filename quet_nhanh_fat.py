@@ -4,13 +4,6 @@ import json
 from datetime import datetime, timedelta
 import sys
 
-# Tăng giới hạn đệ quy để cho phép quét thư mục sâu hơn (nếu cần)
-# sys.setrecursionlimit(2000)
-
-# === CONFIG (CẤU HÌNH) ===
-# THAY ĐỔI: Sử dụng file image cục bộ. Đảm bảo file này tồn tại.
-drive = r"\\.\F:"  # Đường dẫn tới file image ổ đĩa hoặc phân vùng FAT32
-# Nơi lưu file báo cáo JSON
 report_dir = r"C:\NLN\code\Machine-Learning-Forensic-Application" 
 
 # === UTILITIES (TIỆN ÍCH) ===
@@ -244,35 +237,39 @@ def scan_directory(f, cluster, bpb, lay, path=""):
 
 # === MAIN (CHÍNH) ===
 def main():
+    if len(sys.argv) < 2:
+        print("Cách dùng: python quet_sau.py <đường_dẫn_ổ_hoặc_image>")
+        sys.exit(1)
+
+    image_path = sys.argv[1]
+
     try:
-        # Mở file image ở chế độ nhị phân đọc
-        with open(drive, "rb") as f:
-            
-            # Đối với file image, PBR nằm ở sector 0 của file
+        # Mở file image hoặc ổ đĩa
+        with open(image_path, "rb") as f:
+
+            # Đọc sector đầu tiên (Boot Sector)
             start_lba = 0
             boot = read_sector(f, start_lba, 512)
             
             # Kiểm tra chữ ký FAT32
             if boot[510:512] != b'\x55\xaa':
-                print("[!!!] Lỗi: Không tìm thấy chữ ký 0xAA55. File này có thể không phải là FAT32 image hợp lệ.")
+                print("[!!!] Lỗi: Không tìm thấy chữ ký 0xAA55. Có thể không phải FAT32 hợp lệ.")
                 return
 
             bpb = parse_bpb(boot)
             lay = layout(start_lba, bpb)
 
-            print(f"--- THÔNG TIN FAT32 IMAGE: {drive} ---")
+            print(f"--- THÔNG TIN FAT32 IMAGE: {image_path} ---")
             print(f"Bytes per Sector (BPS): {bpb['bps']}")
             print(f"Sectors per Cluster (SPC): {bpb['spc']}")
             print(f"Data Region LBA: {lay['data']}")
             print(f"Root Cluster: {bpb['root']}")
             print("------------------------------------------")
-            
-            # Bắt đầu quét tự động từ Root Directory (cluster mặc định)
+
             print("[*] Bắt đầu quét file đã xóa từ thư mục gốc (Deep Scan)...")
             deleted_files = scan_directory(f, bpb["root"], bpb, lay, "")
             print(f"[*] Hoàn tất quét. Tìm thấy {len(deleted_files)} file đã xóa.")
 
-            # --- IN KẾT QUẢ VÀ CHUẨN BỊ XUẤT JSON ---
             if not deleted_files:
                 print("\n[i] Không tìm thấy file đã xóa nào.")
                 return
@@ -280,9 +277,7 @@ def main():
             print("\n=== KẾT QUẢ CÁC FILE ĐÃ XÓA ===")
             json_export_data = []
             for idx, e in enumerate(deleted_files, 1):
-                json_export_data.append(e) 
-                
-                # In thông tin chi tiết
+                json_export_data.append(e)
                 print(f"--- FILE #{idx} ---")
                 print(f"  Name: {e['name']} (.{e['type'].upper()})")
                 print(f"  Size: {e['size']} bytes")
@@ -291,26 +286,20 @@ def main():
                 print(f"  Created: {e['created']}")
                 print(f"  Modified: {e['modified']}")
                 print(f"  Status: {e['status']}")
-                
+
             # --- XUẤT RA JSON ---
-            report_filename = "deleted_files.json"
-            os.makedirs(report_dir, exist_ok=True)
-            report_path = os.path.join(report_dir, report_filename)
-            
             try:
-                with open(report_path, "w", encoding="utf-8") as json_file:
+                with open("deleted_files.json", "w", encoding="utf-8") as json_file:
                     json.dump(json_export_data, json_file, indent=4, ensure_ascii=False)
-                
-                print(f"\n[+] ĐÃ XUẤT BÁO CÁO JSON THÀNH CÔNG:")
-                print(f"    Vị trí: {report_path}")
-                
+                print(f"\n[+] ĐÃ XUẤT BÁO CÁO JSON: deleted_files.json")
             except Exception as e:
                 print(f"\n[!!!] Lỗi khi xuất file JSON: {e}")
-                
+
     except FileNotFoundError:
-        print(f"\n[!!!] Lỗi: Không tìm thấy file image '{drive}'. Vui lòng kiểm tra CONFIG.")
+        print(f"\n[!!!] Lỗi: Không tìm thấy file hoặc ổ '{image_path}'.")
     except Exception as e:
         print(f"\n[!!!] Đã xảy ra lỗi không xác định: {e}")
 
+# ---- CHỈ GỌI main() MỘT LẦN ----
 if __name__ == "__main__":
     main()

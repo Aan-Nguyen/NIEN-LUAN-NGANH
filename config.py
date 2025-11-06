@@ -1,5 +1,4 @@
 # config.py
-
 import os
 
 # --- CẤU HÌNH ĐƯỜNG DẪN DỮ LIỆU ---
@@ -11,5 +10,5 @@ MENU_ITEMS = ["🏠  Home", "🔍  Quét dữ liệu", "📋  Phiên làm vi�
 
 # --- ĐƯỜNG DẪN ẢNH GIẢ LẬP (Tùy thuộc cấu trúc thư mục của bạn) ---
 IMAGE_PATH_INTERNAL = "gui/assets/logo.png"
-IMAGE_PATH_USB = "gui/assets/icons/usb_drive.png"
+IMAGE_PATH_USB = "gui/assets/icons/usb.png"
 IMAGE_PATH_PARTITION = "gui/assets/icons/partition.png"

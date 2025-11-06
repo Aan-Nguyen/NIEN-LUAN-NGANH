@@ -1,0 +1,267 @@
+{
+  "target_info": {
+    "letter": "F:",
+    "label": "FAT32",
+    "filesystem": "FAT32",
+    "size": "57.70 GB",
+    "free": "37.40 GB",
+    "offset": 1048576,
+    "path": "\\\\.\\F:",
+    "partition_index": 0
+  },
+  "scan_type": "deep",
+  "deleted_files_formatted": [
+    {
+      "Tên file": "jpg_1.jpg",
+      "Loại": "jpg",
+      "Size": 36050,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_1.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 417110692,
+        "size": 36050,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_1.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    },
+    {
+      "Tên file": "jpg_2.jpg",
+      "Loại": "jpg",
+      "Size": 6681,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_2.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 418292721,
+        "size": 6681,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_2.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    },
+    {
+      "Tên file": "jpg_3.jpg",
+      "Loại": "jpg",
+      "Size": 44090,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_3.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 533249650,
+        "size": 44090,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_3.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    },
+    {
+      "Tên file": "jpg_4.jpg",
+      "Loại": "jpg",
+      "Size": 93166,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_4.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 533295475,
+        "size": 93166,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_4.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    },
+    {
+      "Tên file": "jpg_5.jpg",
+      "Loại": "jpg",
+      "Size": 44362,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_5.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 537507519,
+        "size": 44362,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_5.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    },
+    {
+      "Tên file": "jpg_6.jpg",
+      "Loại": "jpg",
+      "Size": 78107,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_6.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 537553530,
+        "size": 78107,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_6.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    },
+    {
+      "Tên file": "jpg_7.jpg",
+      "Loại": "jpg",
+      "Size": 15366,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_7.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 537631813,
+        "size": 15366,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_7.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    },
+    {
+      "Tên file": "jpg_8.jpg",
+      "Loại": "jpg",
+      "Size": 25222,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_8.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 543644963,
+        "size": 25222,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_8.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    },
+    {
+      "Tên file": "jpg_9.jpg",
+      "Loại": "jpg",
+      "Size": 36163,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_9.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 543673315,
+        "size": 36163,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_9.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    },
+    {
+      "Tên file": "jpg_10.jpg",
+      "Loại": "jpg",
+      "Size": 25910,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_10.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 543843609,
+        "size": 25910,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_10.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    },
+    {
+      "Tên file": "jpg_11.jpg",
+      "Loại": "jpg",
+      "Size": 29246,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_11.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 544427055,
+        "size": 29246,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_11.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    },
+    {
+      "Tên file": "jpg_12.jpg",
+      "Loại": "jpg",
+      "Size": 74416,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_12.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 544464785,
+        "size": 74416,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_12.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    },
+    {
+      "Tên file": "jpg_13.jpg",
+      "Loại": "jpg",
+      "Size": 17401,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_13.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 589084130,
+        "size": 17401,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_13.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    },
+    {
+      "Tên file": "jpg_14.jpg",
+      "Loại": "jpg",
+      "Size": 4689,
+      "Ngày tạo": null,
+      "Tình trạng": null,
+      "Chi tiết": {
+        "name": "jpg_14.jpg",
+        "full_path": "\\\\.\\F:",
+        "offset": 591294966,
+        "size": 4689,
+        "type": "jpg",
+        "temp_path": "C:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_14.jpg",
+        "created": null,
+        "modified": null,
+        "status": null
+      }
+    }
+  ]
+}

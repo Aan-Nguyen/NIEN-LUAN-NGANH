@@ -1,21 +1,21 @@
 {
   "disks": [
     {
-      "name": "PHYSICALDRIVE1",
+      "name": "PhysicalDrive1",
       "vendor": "USB",
       "model": "USB  SanDisk 3.2Gen1 USB Device",
       "serial": "0901272b139b28742a7c",
       "protocol": "USB",
       "size": "57.71 GB",
-      "path": "\\\\.\\F:",
-      "index": 0,
+      "path": "\\\\.\\PhysicalDrive1",
+      "index": 1,
       "volumes": [
         {
           "letter": "F:",
           "label": "FAT32",
           "filesystem": "FAT32",
           "size": "57.70 GB",
-          "free": "57.70 GB",
+          "free": "37.37 GB",
           "offset": 1048576,
           "path": "\\\\.\\F:",
           "partition_index": 0
@@ -23,53 +23,21 @@
       ]
     },
     {
-      "name": "PHYSICALDRIVE2",
-      "vendor": "WDC",
-      "model": "WDC WD16 00BEVT-80A23T0 SCSI Disk Device",
-      "serial": "DD564198838A3",
-      "protocol": "USB",
-      "size": "149.05 GB",
-      "path": "\\\\.\\D:",
-      "index": 1,
-      "volumes": [
-        {
-          "letter": "D:",
-          "label": "New Volume",
-          "filesystem": "NTFS",
-          "size": "12.82 GB",
-          "free": "12.77 GB",
-          "offset": 1048576,
-          "path": "\\\\.\\D:",
-          "partition_index": 0
-        },
-        {
-          "letter": "E:",
-          "label": "New Volume",
-          "filesystem": "NTFS",
-          "size": "136.23 GB",
-          "free": "136.14 GB",
-          "offset": 13761511424,
-          "path": "\\\\.\\E:",
-          "partition_index": 1
-        }
-      ]
-    },
-    {
-      "name": "PHYSICALDRIVE0",
+      "name": "PhysicalDrive0",
       "vendor": "NVME",
       "model": "NVMe KBG50ZNT512G LS KIOXIA",
       "serial": "8CE3_8E10_007D_EECE.",
       "protocol": "NVMe",
       "size": "476.94 GB",
-      "path": "\\\\.\\C:",
-      "index": 2,
+      "path": "\\\\.\\PhysicalDrive0",
+      "index": 0,
       "volumes": [
         {
           "letter": "C:",
           "label": "Windows-SSD",
           "filesystem": "NTFS",
           "size": "474.71 GB",
-          "free": "50.51 GB",
+          "free": "101.56 GB",
           "offset": 290455552,
           "path": "\\\\.\\C:",
           "partition_index": 1

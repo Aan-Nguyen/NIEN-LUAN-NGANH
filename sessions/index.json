@@ -1,0 +1,63 @@
+[
+  {
+    "session_name": "Phiên 20251022_172416",
+    "device_name": "FAT32",
+    "timestamp": "20251022_172416",
+    "file_path": "sessions\\session_FAT32_20251022_172416.json",
+    "total_files": 9
+  },
+  {
+    "session_name": "Phiên 20251022_172924",
+    "device_name": "FAT32",
+    "timestamp": "20251022_172924",
+    "file_path": "sessions\\session_FAT32_20251022_172924.json"
+  },
+  {
+    "session_name": "Phiên 20251022_174106",
+    "device_name": "Ổ_F",
+    "timestamp": "20251022_174106",
+    "file_path": "sessions\\session_Ổ_F_20251022_174106.json"
+  },
+  {
+    "session_name": "Phiên 20251022_175350",
+    "device_name": "FAT32",
+    "timestamp": "20251022_175350",
+    "file_path": "sessions\\session_FAT32_20251022_175350.json"
+  },
+  {
+    "session_name": "Phiên 20251026_150913",
+    "device_name": "FAT32",
+    "timestamp": "20251026_150913",
+    "file_path": "sessions\\session_FAT32_20251026_150913.json"
+  },
+  {
+    "session_name": "Phiên 20251026_161440",
+    "device_name": "FAT32",
+    "timestamp": "20251026_161440",
+    "file_path": "sessions\\session_FAT32_20251026_161440.json"
+  },
+  {
+    "session_name": "Phiên 20251031_204209",
+    "device_name": "FAT32",
+    "timestamp": "20251031_204209",
+    "file_path": "sessions\\session_FAT32_20251031_204209.json"
+  },
+  {
+    "session_name": "Phiên 20251103_110636",
+    "device_name": "FAT32",
+    "timestamp": "20251103_110636",
+    "file_path": "sessions\\session_FAT32_20251103_110636.json"
+  },
+  {
+    "session_name": "Phiên 20251103_111627",
+    "device_name": "Windows-SSD",
+    "timestamp": "20251103_111627",
+    "file_path": "sessions\\session_Windows-SSD_20251103_111627.json"
+  },
+  {
+    "session_name": "Phiên 20251103_153150",
+    "device_name": "FAT32",
+    "timestamp": "20251103_153150",
+    "file_path": "sessions\\session_FAT32_20251103_153150.json"
+  }
+]

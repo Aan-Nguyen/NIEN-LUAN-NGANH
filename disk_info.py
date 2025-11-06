@@ -1,17 +1,5 @@
-import psutil
-import wmi
-import json
-import re
-
-def format_size(bytes_size):
-    if bytes_size is None:
-        return "0 B"
-    size = float(bytes_size)
-    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
-        if size < 1024:
-            return f"{size:.2f} {unit}"
-        size /= 1024
-    return f"{size:.2f} PB"
+import sys, os, json, re, psutil, wmi
+from utils import format_size
 
 def extract_vendor(model):
     if not model:
@@ -29,62 +17,67 @@ def get_protocol(disk):
     pnp = getattr(disk, "PNPDeviceID", "").upper()
 
     if "NVME" in model:
-        return "NVMe" 
-    elif iface in ["IDE", "SCSI", "SAS"] or "USB" in iface or "USB" in model or "USB" in pnp:
+        return "NVMe"
+    elif "USB" in iface or "USB" in model or "USB" in pnp:
         return "USB"
-    else:
-        return "Unknown"
+    elif iface in ["IDE", "SCSI", "SAS"]:
+        return iface
+    return "Unknown"
+
+def safe_usage(path):
+    try:
+        return psutil.disk_usage(path)
+    except Exception:
+        return None
 
 def get_disk_info():
     c = wmi.WMI()
     disks = []
 
-    for d_index, disk in enumerate(c.Win32_DiskDrive()):
-        disk_name = disk.DeviceID.split("\\")[-1]
-        model = disk.Model or "Unknown"
+    for disk in c.Win32_DiskDrive():
+        device_id = disk.DeviceID or ""
+        # Lấy số thật từ chuỗi "\\.\PHYSICALDRIVEX"
+        match = re.search(r"PhysicalDrive(\d+)", device_id, re.I)
+        d_index = int(match.group(1)) if match else -1
+        disk_name = f"PhysicalDrive{d_index}" if d_index >= 0 else "UnknownDrive"
+        model = (disk.Model or "Unknown").strip()
         vendor = extract_vendor(model)
-        serial = getattr(disk, "SerialNumber", "").strip()
+        serial = (getattr(disk, "SerialNumber", "") or "").strip()
         protocol = get_protocol(disk)
-        size_bytes = int(disk.Size) if disk.Size else 0
+        size_bytes = int(disk.Size) if getattr(disk, "Size", None) else 0
 
         volumes = []
-        raw_path_disk = ""
-        for partition in disk.associators("Win32_DiskDriveToDiskPartition"):
-            try:
-                part_index = int(getattr(partition, "Index", -1))
-            except Exception:
-                part_index = -1
+        for partition in disk.associators("Win32_DiskDriveToDiskPartition") or []:
+            for logical in partition.associators("Win32_LogicalDiskToPartition") or []:
+                drive_letter = getattr(logical, "DeviceID", None)
+                if not drive_letter:
+                    continue  # bỏ volume không có tên (không có ký tự ổ)
 
-            for logical in partition.associators("Win32_LogicalDiskToPartition"):
-                drive_letter = logical.DeviceID
-                usage = None
-                try:
-                    usage = psutil.disk_usage(drive_letter + "\\")
-                except (PermissionError, FileNotFoundError, OSError):
-                    usage = None
-
-                raw_path = f"\\\\.\\{drive_letter}"
-                raw_path_disk = raw_path if not raw_path_disk else raw_path_disk
-
+                usage = safe_usage(drive_letter + "\\")
+                raw_path = f"\\\\.\\{drive_letter.strip()}"
                 volumes.append({
-                    "letter": drive_letter.replace("\\", "/"),
-                    "label": logical.VolumeName or "",
-                    "filesystem": logical.FileSystem or "",
+                    "letter": drive_letter.strip(),
+                    "label": getattr(logical, "VolumeName", "") or "",
+                    "filesystem": getattr(logical, "FileSystem", "") or "",
                     "size": format_size(usage.total) if usage else "0 B",
                     "free": format_size(usage.free) if usage else "0 B",
-                    "offset": int(getattr(partition, "StartingOffset", 0)),
+                    "offset": int(getattr(partition, "StartingOffset", 0) or 0),
                     "path": raw_path,
-                    "partition_index": part_index
+                    "partition_index": int(getattr(partition, "Index", -1))
                 })
 
+        # Bỏ ổ không có logical volumes (tức là toàn bộ volumes đều không có letter)
+        if not volumes:
+            continue
+
         disks.append({
-            "name": disk_name.upper(),
+            "name": disk_name,
             "vendor": vendor,
-            "model": model.strip(),
+            "model": model,
             "serial": serial,
-            "protocol": protocol.strip(),
+            "protocol": protocol,
             "size": format_size(size_bytes),
-            "path": raw_path_disk,
+            "path": f"\\\\.\\PhysicalDrive{d_index}",
             "index": d_index,
             "volumes": volumes
         })
@@ -95,5 +88,4 @@ if __name__ == "__main__":
     info = get_disk_info()
     with open("disk_info.json", "w", encoding="utf-8") as f:
         json.dump(info, f, indent=2, ensure_ascii=False)
-
     print(json.dumps(info, indent=2, ensure_ascii=False))

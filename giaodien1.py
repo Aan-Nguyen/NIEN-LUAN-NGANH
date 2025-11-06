@@ -1,6 +1,6 @@
 # giaodien1.py
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont, QPixmap
 import sys, json, os, subprocess
 from styles import get_app_stylesheet
@@ -9,10 +9,10 @@ from config import JSON_PATH, TREE_HEADERS, MENU_ITEMS, IMAGE_PATH_INTERNAL, IMA
 sys.stdout.reconfigure(encoding='utf-8')
 
 class RecoverApp(QWidget):
+    scan_requested = pyqtSignal(dict, str)
+    sessions_requested = pyqtSignal()
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Recover File App")
-        self.resize(1100, 650)
         self.disk_data = {}
         self.setStyleSheet(get_app_stylesheet())
         self.setupUI()
@@ -23,28 +23,39 @@ class RecoverApp(QWidget):
         main_layout = QHBoxLayout(self)
         main_layout.setContentsMargins(0,0,0,0)
 
-        # Sidebar
+        # -------------------- Sidebar --------------------
         sidebar_layout = QVBoxLayout()
         sidebar_layout.setSpacing(20)
         sidebar_layout.setContentsMargins(10,20,10,20)
+
         sidebar_layout.addWidget(QLabel("🧭 <b>Recover File</b>", alignment=Qt.AlignCenter, font=QFont("Segoe UI",14)))
 
-        menu = QListWidget()
-        menu.setFixedWidth(200)
-        for name in MENU_ITEMS: menu.addItem(QListWidgetItem(name))
-        sidebar_layout.addWidget(menu)
-         # Home button
-        home_btn = QPushButton("🏠 Home")
-        home_btn.clicked.connect(self.go_home)
-        sidebar_layout.addWidget(home_btn)
-        
-    
+        # --------- Nút Reset ----------
+        reset_btn = QPushButton("🔄 Reset")
+        reset_btn.clicked.connect(self.scan_disks_from_script)
+        reset_btn.setFixedHeight(40)
+        sidebar_layout.addWidget(reset_btn)
+
+        # --------- Nút Quét ngay ----------
+        scan_btn = QPushButton("▶ Quét ngay")
+        scan_btn.clicked.connect(self.scan_model)
+        scan_btn.setFixedHeight(40)
+        sidebar_layout.addWidget(scan_btn)
+
+        # --------- Phiên làm việc / mở giao diện quét ----------
+        work_btn = QPushButton("🗂 Phiên làm việc")
+        work_btn.clicked.connect(self.open_session_file)
+        work_btn.setFixedHeight(40)
+        sidebar_layout.addWidget(work_btn)
+
+        sidebar_layout.addStretch()  # đẩy nút lên trên
+
         sidebar = QFrame()
         sidebar.setLayout(sidebar_layout)
         sidebar.setFixedWidth(220)
         sidebar.setObjectName("sidebar")
 
-        # Content
+        # -------------------- Content chính --------------------
         content_layout = QVBoxLayout()
         content_layout.setContentsMargins(20,20,20,20)
         content_layout.addWidget(QLabel("Thiết bị / Ổ đĩa có sẵn", font=QFont("Segoe UI",13,QFont.Bold)))
@@ -55,14 +66,7 @@ class RecoverApp(QWidget):
         self.tree.header().setSectionResizeMode(QHeaderView.Stretch)
         content_layout.addWidget(self.tree)
 
-        btn_layout = QHBoxLayout()
-        for text, func in [("🔄 Reset", self.scan_disks_from_script), ("▶ Quét ngay", self.scan_model)]:
-            btn = QPushButton(text)
-            btn.clicked.connect(func)
-            btn_layout.addWidget(btn)
-        content_layout.addLayout(btn_layout)
-
-        # Right panel
+        # -------------------- Right panel --------------------
         right_panel = QFrame()
         right_panel.setFixedWidth(260)
         right_panel.setObjectName("rightPanel")
@@ -80,15 +84,16 @@ class RecoverApp(QWidget):
         right_layout.addWidget(self.detail_info)
         right_layout.addStretch()
 
+        # -------------------- Add layout vào main --------------------
         main_layout.addWidget(sidebar)
         main_layout.addLayout(content_layout)
         main_layout.addWidget(right_panel)
 
-# ===================== Chuyển về Home =====================
+    # ===================== Chuyển về Home =====================
     def go_home(self):
-        self.show()  # Hiển thị lại Home
-        if hasattr(self, "next_window") and self.next_window.isVisible():
-            self.next_window.close()  # Đóng giao diện quét nếu đang mở
+        self.scan_requested.emit({}, "")
+    def open_session_file(self):
+        self.sessions_requested.emit()
     # ===================== Lấy phân vùng/ổ đang chọn =====================
     def get_selected_disk_info(self):
         item = self.tree.currentItem()
@@ -124,10 +129,7 @@ class RecoverApp(QWidget):
         clicked = msg.clickedButton()
         scan_type = "quick" if clicked == quick_btn else "deep"
 
-        from giaodien2 import RecoverDeletedApp
-        self.next_window = RecoverDeletedApp(target=selected_info, scan_type=scan_type)
-        self.next_window.show()
-        self.close()
+        self.scan_requested.emit(selected_info, scan_type)
 
     # ===================== Chạy script reset quét ổ =====================
     def scan_disks_from_script(self):
@@ -202,9 +204,9 @@ class RecoverApp(QWidget):
         self.detail_info.setText("".join(html))
 
 
-# ===================== RUN APP =====================
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = RecoverApp()
-    window.show()
-    sys.exit(app.exec_())
+# # ===================== RUN APP =====================
+# if __name__ == "__main__":
+#     app = QApplication(sys.argv)
+#     window = RecoverApp()
+#     window.show()
+#     sys.exit(app.exec_())

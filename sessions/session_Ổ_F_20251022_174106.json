@@ -1,0 +1,110 @@
+[
+    {
+        "name": "Pictures - Shortcut.lnk",
+        "type": "lnk",
+        "size": 893,
+        "created": "27/09/2025 18:20:05",
+        "modified": "29/07/2025 11:29:38",
+        "accessed": "28/09/2025 00:00:00",
+        "full_path": "Pictures - Shortcut.lnk",
+        "offset": 8716288,
+        "start_cluster": 7,
+        "status": "Overwritten"
+    },
+    {
+        "name": "z4100772354555_002_3e96f7bde7648ff146176118f63b92a3.jpg",
+        "type": "jpg",
+        "size": 120779,
+        "created": "27/09/2025 18:41:24",
+        "modified": "09/07/2023 20:07:14",
+        "accessed": "27/09/2025 00:00:00",
+        "full_path": "z4100772354555_002_3e96f7bde7648ff146176118f63b92a3.jpg",
+        "offset": 8781824,
+        "start_cluster": 8,
+        "status": "Overwritten"
+    },
+    {
+        "name": "?L8OE4OJ.PNG",
+        "type": "png",
+        "size": 48266,
+        "created": "28/09/2025 11:25:08",
+        "modified": "29/06/2025 19:10:18",
+        "accessed": "28/09/2025 00:00:00",
+        "full_path": "?L8OE4OJ.PNG",
+        "offset": 8847360,
+        "start_cluster": 9,
+        "status": "Overwritten"
+    },
+    {
+        "name": "Hinh-nen-12-vi-than-Truong-Nguyet-Tan-Minh-4K-dep-net-cho-may-tinh.jpg",
+        "type": "jpg",
+        "size": 1956282,
+        "created": "28/09/2025 11:46:19",
+        "modified": "05/03/2025 08:46:32",
+        "accessed": "28/09/2025 00:00:00",
+        "full_path": "Hinh-nen-12-vi-than-Truong-Nguyet-Tan-Minh-4K-dep-net-cho-may-tinh.jpg",
+        "offset": 8847360,
+        "start_cluster": 9,
+        "status": "Partially Recoverable"
+    },
+    {
+        "name": "Hinh-nen-12-vi-than-Truong-Nguyet-Tan-Minh-4K-dep-net-cho-may-tinh.jpg",
+        "type": "jpg",
+        "size": 1956282,
+        "created": "28/09/2025 11:46:19",
+        "modified": "05/03/2025 08:46:32",
+        "accessed": "28/09/2025 00:00:00",
+        "full_path": "New folder\\Hinh-nen-12-vi-than-Truong-Nguyet-Tan-Minh-4K-dep-net-cho-may-tinh.jpg",
+        "offset": 8847360,
+        "start_cluster": 9,
+        "status": "Partially Recoverable"
+    },
+    {
+        "name": "z5137493268736_d548f4c7fb1f586a6d83e4f38c955579.jpg",
+        "type": "jpg",
+        "size": 1041200,
+        "created": "28/09/2025 23:06:41",
+        "modified": "02/07/2024 20:13:34",
+        "accessed": "28/09/2025 00:00:00",
+        "full_path": "z5137493268736_d548f4c7fb1f586a6d83e4f38c955579.jpg",
+        "offset": 8847360,
+        "start_cluster": 9,
+        "status": "Partially Recoverable"
+    },
+    {
+        "name": "z4100772354555_002_3e96f7bde7648ff146176118f63b92a3.jpg",
+        "type": "jpg",
+        "size": 120779,
+        "created": "28/09/2025 23:06:41",
+        "modified": "09/07/2023 20:07:14",
+        "accessed": "28/09/2025 00:00:00",
+        "full_path": "z4100772354555_002_3e96f7bde7648ff146176118f63b92a3.jpg",
+        "offset": 9895936,
+        "start_cluster": 25,
+        "status": "Recoverable"
+    },
+    {
+        "name": "z4501856296005_e5a9f8f51ed80e019aafad6f2456eb48.jpg",
+        "type": "jpg",
+        "size": 197403,
+        "created": "28/09/2025 23:06:41",
+        "modified": "09/07/2023 20:16:44",
+        "accessed": "28/09/2025 00:00:00",
+        "full_path": "z4501856296005_e5a9f8f51ed80e019aafad6f2456eb48.jpg",
+        "offset": 10027008,
+        "start_cluster": 27,
+        "status": "Recoverable"
+    },
+    {
+        "name": "z4501857975031_e136ff5eab8ee1285a28e556a60c8c1b.jpg",
+        "type": "jpg",
+        "size": 54364,
+        "created": "28/09/2025 23:06:41",
+        "modified": "09/07/2023 20:16:56",
+        "accessed": "28/09/2025 00:00:00",
+        "full_path": "z4501857975031_e136ff5eab8ee1285a28e556a60c8c1b.jpg",
+        "offset": 10289152,
+        "start_cluster": 31,
+        "status": "Recoverable"
+    }
+]

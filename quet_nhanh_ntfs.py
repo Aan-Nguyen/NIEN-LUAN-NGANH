@@ -7,7 +7,6 @@ import sys
 import os
 
 # === CẤU HÌNH MẶC ĐỊNH ===
-PARTITION = r"\\.\D:"             # thay mặc định nếu muốn
 OUT_JSON = "deleted_files.json"
 BUFFER_SIZE = 1024 * 1024 * 4     # 4MB đọc theo cluster/run
 
@@ -318,17 +317,19 @@ build_full_path_from_tree = build_full_path
 
 # === HÀM CHÍNH ===
 def main():
-    partition = PARTITION
-    if len(sys.argv) >= 2:
-        partition = sys.argv[1]
+    if len(sys.argv) < 2:
+        print("Cách dùng: python quet_sau.py <đường_dẫn_ổ_hoặc_image>")
+        sys.exit(1)
 
-    if not os.path.exists(partition):
-        print("[!] Partition path không tồn tại:", partition)
+    image_path = sys.argv[1]
+
+    if not os.path.exists(image_path):
+        print("[!] Partition path không tồn tại:", image_path)
         return
 
     results = []
     try:
-        with open(partition, "rb") as f:
+        with open(image_path, "rb") as f:
             # đọc boot
             cluster_size, mft_cluster, record_size = read_boot_sector(f)
             mft_offset = mft_cluster * cluster_size
