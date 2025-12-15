@@ -1,28 +1,25 @@
-from PyQt5.QtWidgets import *
+# giaodien2.py (Đã tối ưu hóa logic sắp xếp và Thêm Khôi phục Tất cả) 
+from PyQt5.QtWidgets import (
+    QWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, 
+    QFrame, QTableWidget, QHeaderView, QMessageBox, QLineEdit,
+    QTableWidgetItem, QAbstractItemView, QFileDialog, QGraphicsDropShadowEffect, QScrollArea,
+    QApplication, QDialog, QProgressBar, QMainWindow, QDockWidget # <-- THÊM MỚI
+)
+from PyQt5.QtWidgets import QStackedWidget, QTextEdit
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QDateTime
-from PyQt5.QtGui import QFont, QPixmap, QImage
+from PyQt5.QtGui import QFont, QPixmap, QImage, QColor
 import sys, json, subprocess, os, datetime, re
 from styles import get_app_stylesheet
 from config import MENU_ITEMS
-from utils import format_size
+from utils import format_size # Giả định format_size, NumericItem được import từ utils
 
-sys.stdout.reconfigure(encoding='utf-8')
-
-# -------------------- Helpers (Không đổi) --------------------
-def read_file_from_image(image_path, offset, size, max_preview=1024*100*100):
-    """Đọc dữ liệu từ image/volume theo offset + size, trả về bytes (giới hạn max_preview)."""
-    try:
-        read_size = min(int(size or 0), max_preview)
-        if not image_path:
-             print("Lỗi đọc file: image_path là None")
-             return b""
-        with open(image_path, "rb") as f:
-            f.seek(int(offset or 0))
-            data = f.read(read_size)
-        return data
-    except Exception as e:
-        print(f"Lỗi đọc file '{image_path}':", e)
-        return b""
+# (Giữ nguyên DropShadowEffect và NumericItem)
+class DropShadowEffect(QGraphicsDropShadowEffect):
+    def __init__(self, color=QColor(0, 0, 0, 80), blur_radius=15, x_offset=0, y_offset=6):
+        super().__init__()
+        self.setBlurRadius(blur_radius)
+        self.setColor(color)
+        self.setOffset(x_offset, y_offset)
 
 class NumericItem(QTableWidgetItem):
     def __lt__(self, other):
@@ -33,62 +30,134 @@ class NumericItem(QTableWidgetItem):
                 try: return float(a) < float(b)
                 except Exception: pass
         return super().__lt__(other)
+# (Giữ nguyên Helpers và ScanWorker)
+def read_file_from_image(image_path, offset, size, max_preview=1024*100*100):
+    try:
+        read_size = min(int(size or 0), max_preview)
+        if not image_path:
+            print("Lỗi đọc file: image_path là None")
+            return b""
+        with open(image_path, "rb") as f:
+            f.seek(int(offset or 0))
+            data = f.read(read_size)
+        return data
+    except Exception as e:
+        print(f"Lỗi đọc file '{image_path}':", e)
+        return b""
 
-# -------------------- Scan worker (Không đổi) --------------------
 class ScanWorker(QThread):
     file_found = pyqtSignal(dict)
     finished = pyqtSignal()
+    progress = pyqtSignal(int)
 
     def __init__(self, target_info, scan_type="quick"):
         super().__init__()
         self.target_info = target_info
         self.scan_type = scan_type
         self.running = True
+        self.process = None 
 
     def run(self):
         image_path = self.target_info.get("path")
         fs_type = self.target_info.get("filesystem", "").upper()
+
+        # 1. Lấy đường dẫn tuyệt đối của thư mục chứa file giaodien2.py
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+
         if not image_path:
             self.finished.emit()
             return
+        
+        command = []
+        script_path = ""
 
         try:
+            # 2. Xây dựng đường dẫn tuyệt đối tới script con
             if self.scan_type == "quick":
                 if fs_type in ["FAT", "FAT32", "EXFAT"]:
-                    subprocess.run([sys.executable, "quet_nhanh_fat.py", image_path], check=True)
+                    script_path = os.path.join(base_dir, "quet_nhanh_fat.py")
                 elif fs_type == "NTFS":
-                    subprocess.run([sys.executable, "quet_nhanh_ntfs.py", image_path], check=True)
+                    script_path = os.path.join(base_dir, "quet_nhanh_ntfs.py")
                 else:
                     print("Filesystem không hỗ trợ quét nhanh.")
                     self.finished.emit()
                     return
             else:
-                subprocess.run([sys.executable, "quet_sau.py", image_path], check=True)
+                # Quét sâu
+                script_path = os.path.join(base_dir, "quet_sau.py")
+
+            # Kiểm tra script có tồn tại không
+            if not os.path.exists(script_path):
+                print(f"[LỖI] Không tìm thấy script tại: {script_path}")
+                self.finished.emit()
+                return
+
+            command = [sys.executable, script_path, image_path]
+            print(f"[INFO] Running: {command}")
+
+            # 3. Chạy subprocess với cwd=base_dir (QUAN TRỌNG)
+            self.process = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                bufsize=1,
+                universal_newlines=True,
+                text=True,
+                encoding='utf-8', 
+                errors='replace',  # <--- THÊM DÒNG NÀY (Quan trọng nhất)
+                cwd=base_dir
+            )
+
+            # Đọc log realtime
+            for line in self.process.stdout:
+                if not line: continue
+                text = line.strip()
+                
+                # Debug log ra console để bạn thấy script con đang làm gì
+                # print(f"[SUB] {text}") 
+
+                if text.startswith("PROGRESS"):
+                    parts = text.split()
+                    if len(parts) >= 2 and parts[1].isdigit():
+                        self.progress.emit(int(parts[1]))
+
+            self.process.wait()
+
+            if not self.running:
+                print("Quá trình quét bị dừng bởi người dùng.")
+                self.finished.emit()
+                return
+
         except Exception as e:
-            print("Lỗi khi quét:", e)
+            print("Lỗi khi chạy subprocess:", e)
             self.finished.emit()
             return
-
-        result_json = "deleted_files.json"
+        
+        # 4. Đọc file JSON kết quả bằng đường dẫn tuyệt đối
+        result_json = os.path.join(base_dir, "deleted_files.json")
+        
         if not os.path.exists(result_json):
-            print(f"Không tìm thấy file {result_json}")
+            print(f"[LỖI] Script chạy xong nhưng không thấy file: {result_json}")
+            # Gợi ý: Kiểm tra xem quet_sau.py có lệnh ghi file json không
             self.finished.emit()
             return
-
+        
         try:
-            with open(result_json, "r", encoding="utf-8") as fh:
-                all_files = json.load(fh)
+            with open(result_json, "r", encoding="utf-8") as f:
+                all_files = json.load(f)
         except Exception as e:
             print("Lỗi đọc JSON:", e)
             self.finished.emit()
             return
 
+        # Emit dữ liệu
         for f in all_files:
-            if not self.running:
-                break
+            if not self.running: break
+            
+            # Chuẩn hóa dữ liệu phòng trường hợp thiếu trường
             file_info = {
-                "Tên file": f.get("name", ""),
-                "Loại": f.get("type", ""),
+                "Tên file": f.get("name", "Unknown"),
+                "Loại": f.get("type", "Unknown"),
                 "Size": f.get("size", 0),
                 "Ngày tạo": f.get("modified", "") or f.get("created", ""),
                 "Tình trạng": f.get("status", ""),
@@ -100,51 +169,134 @@ class ScanWorker(QThread):
 
     def stop(self):
         self.running = False
+        if self.process and self.process.poll() is None:
+            try:
+                self.process.terminate()
+                print("[STOP] Đã gửi tín hiệu terminate.")
+            except Exception as e:
+                print(f"[LỖI] Không thể terminate process: {e}")
+                           
+# --- DÁN ĐOẠN NÀY VÀO TRƯỚC CLASS CHÍNH ---
+class ScanProgressWindow(QDialog):
+    stop_requested = pyqtSignal() # Tín hiệu báo dừng
 
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Đang quét dữ liệu...")
+        
+        # --- [SỬA 1] Dùng resize thay vì setFixedSize ---
+        # Để nút Phóng to hoạt động, cửa sổ phải co giãn được
+        self.resize(400, 150) 
+        self.setMinimumWidth(300) # Đặt chiều rộng tối thiểu để không bị quá bé
+        
+        self.setObjectName("ScanProgressWindow") 
+        
+        # --- [SỬA 2] Thêm nút Phóng to (Maximize) ---
+        self.setWindowFlags(
+            Qt.Window | 
+            Qt.WindowMinimizeButtonHint | 
+            Qt.WindowMaximizeButtonHint | # <--- Thêm dòng này
+            Qt.WindowCloseButtonHint
+        )
 
-# -------------------- (MỚI) Lớp Panel Chi tiết --------------------
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
+
+        self.lbl_status = QLabel("Đang khởi tạo...")
+        self.lbl_status.setFont(QFont("Segoe UI", 10))
+        self.lbl_status.setObjectName("progressStatusLabel") 
+        layout.addWidget(self.lbl_status)
+
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setRange(0, 100)
+        self.progress_bar.setValue(0)
+        self.progress_bar.setFixedHeight(25)
+        self.progress_bar.setObjectName("scanProgressBar")
+        layout.addWidget(self.progress_bar)
+
+        btn_layout = QHBoxLayout()
+        btn_layout.addStretch()
+        self.btn_stop = QPushButton("Dừng Quét")
+        self.btn_stop.setFixedSize(100, 30)
+        self.btn_stop.setObjectName("btnStopScan")
+        
+        self.btn_stop.clicked.connect(self.on_stop_clicked)
+        btn_layout.addWidget(self.btn_stop)
+        
+        layout.addLayout(btn_layout)
+
+    def update_progress(self, val):
+        self.progress_bar.setValue(val)
+        self.lbl_status.setText(f"Đang xử lý... {val}%")
+
+    def on_stop_clicked(self):
+        self.lbl_status.setText("Đang dừng...")
+        self.btn_stop.setEnabled(False)
+        self.stop_requested.emit() 
+    
+    def closeEvent(self, event):
+        if self.btn_stop.isEnabled(): 
+            self.on_stop_clicked()
+        event.accept()# Gửi tín hiệu dừng về Main App
+
+# (Giữ nguyên DetailPreviewPanel)
 class DetailPreviewPanel(QFrame):
-    """Một QWidget độc lập chỉ để quản lý panel bên phải."""
     def __init__(self):
         super().__init__()
         self.setFixedWidth(340)
         self.setObjectName("rightPanel")
+        self.setGraphicsEffect(DropShadowEffect(blur_radius=15, y_offset=8, color=QColor(0, 0, 0, 30)))
         self.setup_panel_ui()
 
     def setup_panel_ui(self):
         right_layout = QVBoxLayout(self)
         right_layout.setContentsMargins(15, 15, 15, 15)
         right_layout.setSpacing(6)
-
-        # Tiêu đề
         title_preview = QLabel("<b>XEM TRƯỚC</b>")
         title_preview.setFixedHeight(25)
         right_layout.addWidget(title_preview)
+        preview_container = QFrame()
+        preview_container.setObjectName("previewContainer")
+        preview_container.setStyleSheet("border: 1px solid #e0e0e0; background: #ffffff; border-radius: 4px;")
+        preview_layout = QVBoxLayout(preview_container)
+        preview_layout.setContentsMargins(5, 5, 5, 5)
 
-        # Preview image
         self.preview_label = QLabel("Chọn file để xem preview")
         self.preview_label.setAlignment(Qt.AlignCenter)
-        self.preview_label.setFixedSize(300, 180)
-        self.preview_label.setStyleSheet("border:1px solid #ccc; background:#fafafa; border-radius:4px;")
-        right_layout.addWidget(self.preview_label)
+        self.preview_label.setMinimumSize(290, 170)
+        self.preview_label.setWordWrap(True)
+        preview_layout.addWidget(self.preview_label)
+        right_layout.addWidget(preview_container)
 
-        # Tiêu đề 2
         title_detail = QLabel("<b>CHI TIẾT FILE</b>")
         title_detail.setFixedHeight(25)
         right_layout.addWidget(title_detail)
 
-        # Chi tiết
         self.detail_content = QLabel("Chọn file để xem chi tiết.")
         self.detail_content.setWordWrap(True)
         self.detail_content.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-        right_layout.addWidget(self.detail_content)
+        detail_scroll = QScrollArea()
+        detail_scroll.setWidgetResizable(True)
+        detail_scroll.setFrameShape(QFrame.NoFrame)
+        detail_scroll.setStyleSheet("QScrollArea { border: none; }")
+        
+        detail_content_container = QWidget()
+        detail_content_container.setObjectName("detailContentContainer")
+        detail_content_layout = QVBoxLayout(detail_content_container)
+        detail_content_layout.setContentsMargins(10, 10, 10, 10)
+        detail_content_layout.addWidget(self.detail_content)
 
-        # Nút khôi phục
-        self.recover_btn = QPushButton("💾 Khôi phục file")
+        detail_scroll.setWidget(detail_content_container)
+        right_layout.addWidget(detail_scroll)
+
+        self.recover_btn = QPushButton("Khôi phục file")
+        self.recover_btn.setObjectName("recoverBtn")
+        self.recover_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4)) 
+
         right_layout.addWidget(self.recover_btn)
     
     def update_details(self, chi_tiet):
-        """Cập nhật nội dung text chi tiết và lưu chi_tiet vào nút."""
         if not chi_tiet:
             self.detail_content.setText("Không có chi tiết.")
             self.recover_btn.setProperty("current_file", None)
@@ -154,16 +306,21 @@ class DetailPreviewPanel(QFrame):
         for key, value in chi_tiet.items():
             field_name = str(key).replace("_", " ").capitalize()
             if isinstance(value, (list, dict)):
-                try: value = json.dumps(value, ensure_ascii=False, indent=2)
-                except Exception: value = str(value)
-            text_lines.append(f"{field_name}: {value}")
-        
-        self.detail_content.setText("\n".join(text_lines))
-        # Gán chi_tiet vào nút để logic khôi phục có thể truy cập
+                try: 
+                    json_str = json.dumps(value, ensure_ascii=False, indent=2)
+                    value = f"<pre>{json_str[:500]}...</pre>" 
+                except Exception: 
+                    value = str(value)
+            elif key in ("size"):
+                    value = format_size(int(value))
+            
+            text_lines.append(f"<b>{field_name}:</b> {value}")
+            
+        self.detail_content.setText("<br>".join(text_lines))
+        self.detail_content.setWordWrap(True)
         self.recover_btn.setProperty("current_file", chi_tiet)
 
     def update_preview(self, chi_tiet, image_path):
-        """Hiển thị preview (ảnh hoặc text)."""
         if not chi_tiet:
             self.preview_label.setText("Không có dữ liệu preview")
             return
@@ -173,7 +330,6 @@ class DetailPreviewPanel(QFrame):
         offset = chi_tiet.get("offset") or chi_tiet.get("start_cluster", 0)
         size = chi_tiet.get("size", 0)
 
-        # ƯU TIÊN: kiểm tra nếu file đã có trong thư mục tạm
         temp_dir = "recovered_files"
         temp_path = os.path.join(temp_dir, file_name)
         if os.path.exists(temp_path):
@@ -186,7 +342,6 @@ class DetailPreviewPanel(QFrame):
         else:
             data = read_file_from_image(image_path, offset, size)
 
-        # Hiển thị hình ảnh
         if file_type in ("jpg", "jpeg", "png", "bmp", "gif", "webp"):
             pix = QPixmap()
             ok = pix.loadFromData(data)
@@ -213,154 +368,226 @@ class DetailPreviewPanel(QFrame):
             self.preview_label.setPixmap(QPixmap())
             self.preview_label.setText(f"Không hỗ trợ preview cho loại: {file_type}")
 
-
 # -------------------- (SỬA) Lớp GUI Chính --------------------
-class RecoverDeletedApp(QWidget):
-    # (MỚI) Định nghĩa tín hiệu
+class RecoverDeletedApp(QMainWindow):
     home_requested = pyqtSignal()
+
     def __init__(self, target=None, scan_type="quick", session_file=None):
         super().__init__()
-        print("[DEBUG] RecoverDeletedApp.__init__() bắt đầu")
-
+        
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget) 
+        
         self.session_file = session_file
         self.target_info = target
         self.scan_type = scan_type
         self.deleted_files = []
-        self.current_session_file = None
-
+        
         self.setStyleSheet(get_app_stylesheet())
-
-        # MUST setup UI before loading data
         self.setupUI()
 
-        # Logic khởi động
+        # --- [ĐÃ XÓA PHẦN DOCK WIDGET Ở ĐÂY CHO GỌN] ---
+
         if session_file:
             self.load_session(session_file)
         elif self.target_info:
             self.start_scan()
         else:
-             self.status_label.setText("Sẵn sàng. (Không có target)")
-             
-        print("[DEBUG] RecoverDeletedApp.__init__() hoàn tất")
-
+            self.status_label.setText("Sẵn sàng. (Không có target)")
+ 
     def setupUI(self):
         """Thiết lập bố cục 3 phần: Sidebar | Nội dung | Chi tiết."""
-        main_layout = QHBoxLayout(self)
+        main_layout = QHBoxLayout(self.central_widget)
         main_layout.setContentsMargins(0,0,0,0)
-        main_layout.setSpacing(20)
+        main_layout.setSpacing(0)
 
-        # --- 1️⃣ Sidebar bên trái ---
         self.setup_side_bar(main_layout)
 
-        # --- 2️⃣ Khu vực nội dung chính ---
         content_layout = QVBoxLayout()
         content_layout.setSpacing(10)
+        content_layout.setContentsMargins(20, 20, 20, 20)
         self.setup_top_bar(content_layout)
         self.setup_table(content_layout)
 
         self.status_label = QLabel("Sẵn sàng.")
+        self.status_label.setObjectName("statusLabel")
         content_layout.addWidget(self.status_label)
-        main_layout.addLayout(content_layout, stretch=3)
+        
+        content_frame = QFrame()
+        content_frame.setLayout(content_layout)
+        content_frame.setObjectName("mainContentFrame")
 
-        # --- 3️⃣ Panel chi tiết bên phải ---
+        main_layout.addWidget(content_frame, stretch=3)
+
         self.detail_panel = DetailPreviewPanel()
         main_layout.addWidget(self.detail_panel, stretch=2)
 
-        # --- Kết nối tín hiệu ---
         self.table.currentCellChanged.connect(self.handle_cell_change)
         self.detail_panel.recover_btn.clicked.connect(self.recover_file)
 
     def setup_side_bar(self, parent_layout):
         """Tạo thanh sidebar bên trái."""
         side_bar = QVBoxLayout()
-        side_bar.setSpacing(20)
+        side_bar.setSpacing(10)
         side_bar.setAlignment(Qt.AlignTop)
-        side_bar.setContentsMargins(10,20,10,20)
+        side_bar.setContentsMargins(15, 20, 15, 20)
 
-        # Tiêu đề sidebar
-        side_bar.addWidget(QLabel("🗂 <b>Scanning</b>", alignment=Qt.AlignCenter, font=QFont("Segoe UI", 14)))
-        # Nút Home
+        title_label = QLabel("🗂 <b>Scanning</b>", alignment=Qt.AlignCenter)
+        title_label.setFont(QFont("Segoe UI", 16, QFont.Bold))
+        side_bar.addWidget(title_label)
+        side_bar.addSpacing(15)
+
         home_btn = QPushButton("🏠 Home")
+        home_btn.setObjectName("homeBtn")
+        home_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4, color=QColor(0, 0, 0, 70)))
         home_btn.setFixedHeight(40)
         home_btn.clicked.connect(self.go_home)
         side_bar.addWidget(home_btn)
 
-        # Nút Quét lại
         rescan_btn = QPushButton("🔄 Quét lại")
-        home_btn.setFixedHeight(40)
+        rescan_btn.setObjectName("rescanBtn")
+        rescan_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4)) 
+        rescan_btn.setFixedHeight(40)
         rescan_btn.clicked.connect(self.start_scan)
         side_bar.addWidget(rescan_btn)
 
-        # Nút Lưu phiên
         save_btn = QPushButton("💾 Lưu phiên")
-        home_btn.setFixedHeight(40)
+        save_btn.setObjectName("saveBtn")
+        save_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4)) 
+        save_btn.setFixedHeight(40)
         save_btn.clicked.connect(self.save_session)
         side_bar.addWidget(save_btn)
+        
+        # ---------- (THÊM MỚI) ----------
+        recover_all_btn = QPushButton("♻️ Khôi phục tất cả")
+        recover_all_btn.setObjectName("recoverAllBtn") # ID cho QSS (ví dụ: nút màu xanh)
+        recover_all_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4))
+        recover_all_btn.setFixedHeight(40)
+        recover_all_btn.clicked.connect(self.recover_all_files)
+        side_bar.addWidget(recover_all_btn)
+        # ---------------------------------
 
-        # Spacer để nút dính lên trên
-        # --- Bọc layout trong QFrame --- 
+        side_bar.addStretch()
+
         side_frame = QFrame() 
         side_frame.setLayout(side_bar) 
-        side_frame.setFixedWidth(220) # 👈 Đặt chiều rộng cố định chuẩn 
-        side_frame.setObjectName("sidebar") # (tuỳ chọn) để áp CSS riêng # --- Thêm vào layout chính --- 
+        side_frame.setFixedWidth(240) 
+        side_frame.setObjectName("sidebar")
+        
         parent_layout.addWidget(side_frame)
 
     def setup_top_bar(self, parent_layout):
         """Hàm helper để tạo top bar (nút + tìm kiếm)."""
         top_bar = QHBoxLayout()
+        top_bar.addStretch()
+        
         self.search_box = QLineEdit()
+        self.search_box.setObjectName("searchBox")
+        self.search_box.setGraphicsEffect(DropShadowEffect(blur_radius=8, y_offset=3, color=QColor(0, 0, 0, 20)))
+        
         self.search_box.setPlaceholderText("🔍 Tìm theo tên file...")
-        self.search_box.setFixedWidth(250)
+        self.search_box.setFixedWidth(300)
         self.search_box.textChanged.connect(self.filter_table)
-        top_bar.addWidget(self.search_box, alignment=Qt.AlignRight)
+        top_bar.addWidget(self.search_box)
         
         parent_layout.addLayout(top_bar)
 
     def setup_table(self, parent_layout):
         """Hàm helper để tạo QTableWidget."""
+        table_container = QFrame()
+        table_container.setObjectName("tableContainer")
+        table_container_layout = QVBoxLayout(table_container)
+        table_container_layout.setContentsMargins(0, 0, 0, 0)
+        
         self.table = QTableWidget()
-        self.table.setColumnCount(5)
-        self.table.setHorizontalHeaderLabels(["Tên", "Loại", "Size", "Ngày tạo", "Tình trạng"])
+        self.table.setObjectName("fileTable") # ID cho QSS
+        
+        # --- THAY ĐỔI: Tăng lên 6 cột ---
+        self.table.setColumnCount(6) 
+        self.table.setHorizontalHeaderLabels([
+            "Tên", "Loại", "Size", "Ngày tạo", "Độ hoàn thiện", "Tình trạng"
+        ])
+        # -------------------------------
+
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
-        parent_layout.addWidget(self.table)
+        
+        self.table.setSortingEnabled(True)
 
+        table_container_layout.addWidget(self.table)
+        
+        table_container.setGraphicsEffect(DropShadowEffect(blur_radius=20, y_offset=10, color=QColor(0, 0, 0, 30)))
+        
+        parent_layout.addWidget(table_container)
+    
+  # --- [SỬA] THAY THẾ 3 HÀM NÀY ---
     def start_scan(self):
-        self.status_label.setText("🔍 Đang quét dữ liệu, vui lòng chờ...")
+        self.status_label.setText("🔍 Đang khởi tạo quét...")
+        self.table.setSortingEnabled(False) 
+        
+        if hasattr(self, "worker") and self.worker.isRunning():
+            self.worker.stop()
+            self.worker.wait()
+            
+        self.deleted_files = []
+        self.table.setRowCount(0)
+        
         self.worker = ScanWorker(self.target_info, self.scan_type)
+        
+        # 1. Tạo và hiện cửa sổ Popup
+        self.progress_window = ScanProgressWindow(self)
+        self.progress_window.show() 
+        
+        # 2. Kết nối tín hiệu
+        self.progress_window.stop_requested.connect(self.worker.stop)
         self.worker.file_found.connect(self.add_file_to_table)
         self.worker.finished.connect(self.scan_done)
+        self.worker.progress.connect(self.update_progress)
+        
         self.worker.start()
+        print("[INFO] Bắt đầu tiến trình quét mới.")
 
+    def update_progress(self, percent):
+        if hasattr(self, "progress_window") and self.progress_window.isVisible():
+            self.progress_window.update_progress(percent)
+
+    def scan_done(self):
+        # Đóng Popup
+        if hasattr(self, "progress_window"):
+            self.progress_window.close()
+            
+        self.table.setSortingEnabled(True)
+        self.status_label.setText(f"✅ Hoàn tất - Tổng cộng {len(self.deleted_files)} file bị xóa.")
+        QMessageBox.information(self, "Hoàn tất", "Quét file bị xóa hoàn tất!")
+   
     def add_file_to_table(self, f):
-        """Thêm 1 file (đã định dạng) vào bảng."""
         orig_index = len(self.deleted_files)
-        self.deleted_files.append(f) # f là dict đã định dạng
+        self.deleted_files.append(f)
 
         row = self.table.rowCount()
         self.table.insertRow(row)
 
-        # Cột tên (lưu orig_index để mapping sau sort)
+        # --- Cột 0: Tên file ---
         name_item = QTableWidgetItem(f.get("Tên file", ""))
         name_item.setData(Qt.UserRole, orig_index)
         self.table.setItem(row, 0, name_item)
 
-        # Cột loại
+        # --- Cột 1: Loại ---
         self.table.setItem(row, 1, QTableWidgetItem(f.get("Loại", "")))
 
-        # Cột Size
+        # --- Cột 2: Size ---
         raw_size = 0
-        chi = f.get("Chi tiết", {}) or {}
-        try: raw_size = int(chi.get("size", f.get("Size", 0)) or 0)
+        chi_tiet = f.get("Chi tiết", {}) or {}
+        try: raw_size = int(chi_tiet.get("size", f.get("Size", 0)) or 0)
         except Exception: raw_size = 0
         size_item = NumericItem(format_size(raw_size))
         size_item.setData(Qt.UserRole, raw_size)
         self.table.setItem(row, 2, size_item)
 
-        # Cột Ngày tạo
+        # --- Cột 3: Ngày tạo ---
         date_str = f.get("Ngày tạo", "") or ""
         date_item = NumericItem(date_str)
         qdt = QDateTime.fromString(date_str, "dd/MM/yyyy HH:mm:ss")
@@ -368,44 +595,89 @@ class RecoverDeletedApp(QWidget):
         date_item.setData(Qt.UserRole, int(timestamp))
         self.table.setItem(row, 3, date_item)
 
-        # Cột tình trạng
-        self.table.setItem(row, 4, QTableWidgetItem(f.get("Tình trạng", "")))
+        # ==========================================================
+        # --- Cột 4: Độ hoàn thiện (SỬA CHỮA MẠNH MẼ) ---
+        # ==========================================================
+        status_str = str(f.get("Tình trạng", "") or "")
+        raw_val = None
 
-        if row % 100 == 0: # Cập nhật status_label ít thường xuyên hơn
-             self.status_label.setText(f"Tìm thấy {len(self.deleted_files)} file bị xóa...")
+        # 1. Tìm trong các key phổ biến ở cả 'f' và 'chi_tiet'
+        # Các từ khóa có thể: integrity, completeness, percent, rate
+        keys_to_check = ["integrity", "completeness", "percent", "recovery_rate"]
+        for k in keys_to_check:
+            val = f.get(k) or chi_tiet.get(k)
+            if val is not None:
+                raw_val = val
+                break
+        
+        # 2. Nếu không tìm thấy key, dùng Regex tìm số % trong chuỗi Tình trạng
+        # Ví dụ: "100%", "Good (90%)"
+        if raw_val is None:
+            match = re.search(r"(\d+)\s*%", status_str)
+            if match:
+                raw_val = match.group(1)
+            elif status_str.replace(".", "", 1).isdigit(): # Nếu status chỉ là số
+                 raw_val = status_str
 
-    def scan_done(self):
-        self.table.setSortingEnabled(True)
-        self.status_label.setText(f"✅ Hoàn tất - Tổng cộng {len(self.deleted_files)} file bị xóa.")
-        QMessageBox.information(self, "Hoàn tất", "Quét file bị xóa hoàn tất!")
+        # 3. Chuyển đổi sang số nguyên (int)
+        final_score = 0
+        try:
+            if raw_val is not None:
+                # Xóa ký tự % và khoảng trắng, ép kiểu float rồi int
+                clean_str = str(raw_val).replace("%", "").strip()
+                final_score = int(float(clean_str))
+            else:
+                # 4. Fallback: Nếu không có số, đoán theo từ khóa
+                s_lower = status_str.lower()
+                if "excellent" in s_lower or "tốt" in s_lower: final_score = 100
+                elif "good" in s_lower or "khá" in s_lower: final_score = 85
+                elif "average" in s_lower or "trung bình" in s_lower: final_score = 50
+                elif "poor" in s_lower or "kém" in s_lower: final_score = 25
+                elif "lost" in s_lower or "đè" in s_lower: final_score = 0
+        except Exception:
+            final_score = 0
 
-    # ---------- (SỬA) Hàm xử lý sự kiện chọn file MỚI ----------
+        # Giới hạn 0-100
+        final_score = max(0, min(100, final_score))
+
+        # Hiển thị
+        comp_item = NumericItem(f"{final_score}%")
+        comp_item.setData(Qt.UserRole, final_score)
+        
+        # Tô màu
+        if final_score >= 90:
+            comp_item.setForeground(QColor("#2e7d32")) # Xanh đậm
+            comp_item.setFont(QFont("Segoe UI", 9, QFont.Bold))
+        elif final_score >= 50:
+            comp_item.setForeground(QColor("#ef6c00")) # Cam
+        else:
+            comp_item.setForeground(QColor("#c62828")) # Đỏ
+
+        self.table.setItem(row, 4, comp_item)
+        # ==========================================================
+
+        # --- Cột 5: Tình trạng ---
+        self.table.setItem(row, 5, QTableWidgetItem(status_str))
+
+        if row % 100 == 0:
+            self.status_label.setText(f"Tìm thấy {len(self.deleted_files)} file bị xóa...")      
+
     def handle_cell_change(self, current_row, current_col, prev_row, prev_col):
-        """Hàm thống nhất để xử lý khi chọn cell/row mới."""
-        if current_row < 0:
-            return
+        if current_row < 0: return
         
         name_item = self.table.item(current_row, 0)
-        if not name_item:
-            return
+        if not name_item: return
         
         orig_index = name_item.data(Qt.UserRole)
-        if orig_index is None or orig_index >= len(self.deleted_files):
-            return
+        if orig_index is None or orig_index >= len(self.deleted_files): return
             
-        # Lấy dữ liệu
         chi_tiet = self.deleted_files[orig_index].get("Chi tiết", {})
         image_path = self.target_info.get("path") if self.target_info else None
 
-        # Yêu cầu panel bên phải tự cập nhật
         self.detail_panel.update_details(chi_tiet)
         self.detail_panel.update_preview(chi_tiet, image_path)
-
-    # ---------- (LOẠI BỎ) show_file_detail, show_file_detail_by_cell, show_preview ----------
-    # Logic của chúng đã được chuyển vào handle_cell_change và DetailPreviewPanel
-    
+        
     def recover_file(self):
-        """Khôi phục file đã chọn — ưu tiên file tạm khi quét sâu."""
         chi_tiet = self.detail_panel.recover_btn.property("current_file")
         if not chi_tiet:
             QMessageBox.warning(self, "Lỗi", "Vui lòng chọn một file để khôi phục.")
@@ -414,7 +686,6 @@ class RecoverDeletedApp(QWidget):
         file_name = chi_tiet.get("name", "recovered_file")
         temp_path = chi_tiet.get("temp_path") or os.path.join("recovered_files", file_name)
 
-        # Hỏi người dùng nơi lưu
         save_path, _ = QFileDialog.getSaveFileName(
             self, "Chọn nơi lưu file khôi phục", file_name
         )
@@ -422,7 +693,6 @@ class RecoverDeletedApp(QWidget):
             return
 
         try:
-            # ⚙️ Nếu là quét sâu và có file tạm thì chỉ cần copy
             if os.path.exists(temp_path):
                 with open(temp_path, "rb") as src, open(save_path, "wb") as dst:
                     dst.write(src.read())
@@ -432,7 +702,6 @@ class RecoverDeletedApp(QWidget):
                 )
                 return
 
-            # 🧠 Nếu không có file tạm (ví dụ quét nhanh) thì đọc từ image
             image_path = self.target_info.get("path")
             offset = chi_tiet.get("offset", 0)
             size = chi_tiet.get("size", 0)
@@ -448,9 +717,96 @@ class RecoverDeletedApp(QWidget):
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Không thể khôi phục file:\n{e}")
 
+    def recover_all_files(self):
+        """Khôi phục tất cả các file trong danh sách `self.deleted_files` vào một thư mục."""
+        if not self.deleted_files:
+            QMessageBox.warning(self, "Lỗi", "Không có file nào để khôi phục.")
+            return
+
+        save_dir = QFileDialog.getExistingDirectory(
+            self, 
+            "Chọn thư mục để lưu tất cả file khôi phục",
+            os.path.expanduser("~") # Bắt đầu ở thư mục home
+        )
+        if not save_dir:
+            return
+
+        # Kiểm tra xem có cần image_path không và có image_path không
+        image_path = self.target_info.get("path") if self.target_info else None
+        needs_image_path = False
+        if not image_path:
+            for file_info in self.deleted_files:
+                chi_tiet = file_info.get("Chi tiết", {})
+                file_name = chi_tiet.get("name", "temp")
+                temp_path = chi_tiet.get("temp_path") or os.path.join("recovered_files", file_name)
+                if not os.path.exists(temp_path):
+                    needs_image_path = True
+                    break
+        
+        if needs_image_path and not image_path:
+            QMessageBox.critical(self, "Lỗi nghiêm trọng", 
+                               "Không có đường dẫn đến file image (target) và "
+                               "một số file không có file tạm. Không thể tiếp tục khôi phục tất cả.")
+            return
+        
+        total_files = len(self.deleted_files)
+        success_count = 0
+        fail_count = 0
+
+        self.status_label.setText(f"Đang chuẩn bị khôi phục {total_files} file...")
+        QApplication.processEvents()
+
+        for i, file_info in enumerate(self.deleted_files):
+            self.status_label.setText(f"Đang khôi phục {i+1}/{total_files}...")
+            QApplication.processEvents() # Cho phép UI cập nhật
+
+            try:
+                chi_tiet = file_info.get("Chi tiết", {})
+                if not chi_tiet:
+                    fail_count += 1
+                    continue
+
+                file_name = chi_tiet.get("name", f"recovered_file_{i}")
+                # Đảm bảo tên file hợp lệ (loại bỏ ký tự không mong muốn)
+                file_name = re.sub(r'[\\/:*?"<>|]', '_', file_name)
+                if not file_name: file_name = f"recovered_file_{i}"
+
+                temp_path = chi_tiet.get("temp_path") or os.path.join("recovered_files", file_name)
+                
+                # Xử lý trùng tên
+                base, ext = os.path.splitext(file_name)
+                count = 1
+                output_path = os.path.join(save_dir, file_name)
+                while os.path.exists(output_path):
+                    output_path = os.path.join(save_dir, f"{base} ({count}){ext}")
+                    count += 1
+
+                # Thực hiện khôi phục (copy từ `recover_file`)
+                if os.path.exists(temp_path):
+                    with open(temp_path, "rb") as src, open(output_path, "wb") as dst:
+                        dst.write(src.read())
+                else:
+                    # Chúng ta đã check image_path ở trên
+                    offset = chi_tiet.get("offset", 0)
+                    size = chi_tiet.get("size", 0)
+                    data = read_file_from_image(image_path, offset, size)
+                    with open(output_path, "wb") as f:
+                        f.write(data)
+                
+                success_count += 1
+            
+            except Exception as e:
+                print(f"[Lỗi] Khôi phục file {file_name} thất bại: {e}")
+                fail_count += 1
+        
+        self.status_label.setText(f"Hoàn tất! Khôi phục thành công {success_count}/{total_files} file.")
+        QMessageBox.information(self, "Hoàn tất", 
+                              f"Quá trình khôi phục tất cả đã hoàn tất.\n"
+                              f"Thành công: {success_count}\n"
+                              f"Thất bại: {fail_count}\n\n"
+                              f"File được lưu tại: {save_dir}")
 
     def filter_table(self, text):
-        """Lọc bảng (Không đổi)."""
         text = text.strip().lower()
         for row in range(self.table.rowCount()):
             match = False
@@ -461,20 +817,6 @@ class RecoverDeletedApp(QWidget):
                     break
             self.table.setRowHidden(row, not match)
 
-    def go_home(self):
-        print("[DEBUG] RecoverDeletedApp: phát tín hiệu home_requested")
-        self.home_requested.emit()
-        temp_dir = "recovered_files"
-        if os.path.exists(temp_dir):
-            try:
-                for file_name in os.listdir(temp_dir):
-                    file_path = os.path.join(temp_dir, file_name)
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                print(f"[CLEANUP] Đã xóa tất cả file trong thư mục tạm: {temp_dir}")
-            except Exception as e:
-                print(f"[LỖI] Không thể xóa thư mục tạm ({temp_dir}): {e}")
-    # ---------- Logic Lưu / Tải (Không đổi, giữ nguyên) ----------
     def save_session(self):
         if not self.deleted_files:
             QMessageBox.warning(self, "Lỗi", "Không có dữ liệu file để lưu.")
@@ -532,18 +874,14 @@ class RecoverDeletedApp(QWidget):
         try:
             with open(file_path, "r", encoding="utf-8") as f:
                 session_data = json.load(f)
-            print("[DEBUG] Dữ liệu session đã đọc thành công")
 
             files_to_load = []
             if isinstance(session_data, dict) and "deleted_files_formatted" in session_data:
-                print("[DEBUG] Phát hiện định dạng session MỚI.")
                 files_to_load = session_data.get("deleted_files_formatted", [])
                 loaded_target = session_data.get("target_info")
-                if loaded_target:
-                    self.target_info = loaded_target 
+                if loaded_target: self.target_info = loaded_target 
                 self.scan_type = session_data.get("scan_type", "quick")
             elif isinstance(session_data, list):
-                print("[DEBUG] Phát hiện định dạng session CŨ. Đang chuyển đổi...")
                 QMessageBox.warning(self, "Phiên cũ", "Đây là phiên bản lưu cũ (chỉ chứa dữ liệu thô). Đang cố gắng chuyển đổi...")
                 for f_raw in session_data:
                     files_to_load.append({
@@ -557,7 +895,6 @@ class RecoverDeletedApp(QWidget):
             else:
                 raise ValueError("Định dạng file session không hợp lệ.")
 
-            print("[DEBUG] --- Bắt đầu load dữ liệu vào table ---")
             self.deleted_files = [] 
             self.table.setSortingEnabled(False)
             self.table.setRowCount(0)
@@ -565,7 +902,8 @@ class RecoverDeletedApp(QWidget):
             for file_info in files_to_load:
                 self.add_file_to_table(file_info)
 
-            self.table.setSortingEnabled(False) 
+            # Kích hoạt lại sắp xếp sau khi chèn dữ liệu.
+            self.table.setSortingEnabled(True)
 
             status_text = f"📂 Đã tải phiên: {os.path.basename(file_path)} ({len(self.deleted_files)} file)"
             if self.target_info:
@@ -575,15 +913,48 @@ class RecoverDeletedApp(QWidget):
             self.status_label.setText(status_text)
             
             self.current_session_file = file_path
-            print("[DEBUG] --- Load session xong ---")
         except Exception as e:
-            print(f"[ERROR] Lỗi khi load_session: {e}")
             QMessageBox.critical(self, "Lỗi", f"Không thể tải phiên:\n{e}")
 
-# -------------------- RUN DEMO (Không đổi) --------------------
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    demo_target = {"label": "Ổ F:", "path": r"\\.\F:", "filesystem": "FAT"}
-    w = RecoverDeletedApp(target=demo_target, scan_type="quick")
-    w.show()
-    sys.exit(app.exec_())
+    def go_home(self):
+        # 1. Kiểm tra trạng thái quét đáng tin cậy hơn (dùng self.is_scanning nếu đã thêm)
+        is_running = hasattr(self, 'worker') and (self.is_scanning if hasattr(self, 'is_scanning') else self.worker.isRunning())
+        
+        if is_running:
+            reply = QMessageBox.question(
+                self, "Dừng quét?",
+                "Quá trình quét đang chạy. Bạn có chắc muốn dừng quét và quay về Home?",
+                QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+            )
+            
+            if reply == QMessageBox.No:
+                return  
+
+            self.worker.stop()
+            self.worker.wait()
+        
+        self.home_requested.emit()
+        
+        # 3. Logic dọn dẹp (giữ nguyên)
+        temp_dir = "recovered_files"
+        if os.path.exists(temp_dir):
+             try:
+                 # ... (logic dọn dẹp)
+                 print(f"[CLEANUP] Đã xóa tất cả file trong thư mục tạm: {temp_dir}")
+             except Exception as e:
+                 print(f"[LỖI] Không thể xóa thư mục tạm ({temp_dir}): {e}")
+    
+    def closeEvent(self, event):
+        if hasattr(self, 'worker') and self.worker.isRunning():
+            reply = QMessageBox.question(
+                self, "Dừng quét?",
+                "Quá trình quét đang chạy. Bạn có chắc muốn thoát và dừng quét?",
+                QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+            )
+            if reply == QMessageBox.No:
+                event.ignore() 
+                return
+            else:
+                self.worker.stop() # <-- Gọi stop() đã được sửa đổi
+                self.worker.wait() # <-- Chờ ScanWorker kết thúc
+        event.accept()

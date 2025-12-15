@@ -1,11 +1,11 @@
-import os, sys, json, io
+import os, sys, json, io, check 
 from PIL import Image
 
 # ==============================
 # ⚙️ Cấu hình cơ bản
 # ==============================
-CHUNK_SIZE = 128 * 1024 * 1024     # 4 MB mỗi lần đọc
-MAX_BUFFER = 256 * 1024 * 1024    # 64 MB giữ buffer biên
+CHUNK_SIZE = 128 * 1024 * 1024     # 4 MB (thực ra là 128MB theo code gốc)
+MAX_BUFFER = 256 * 1024 * 1024    # 64 MB giữ buffer biên (thực ra là 256MB)
 OUTPUT_DIR = "recovered_files"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -101,17 +101,23 @@ TAIL_FINDERS = {
 
 
 def carve_unified(source_path, max_scan_gb):
-    print(f"[+] Bắt đầu quét: {source_path}")
+    print(f"{source_path}", flush=True)
+    
+    # [THÊM] Báo hiệu bắt đầu
+    print("PROGRESS 0", flush=True)
+    
     results, seen_ranges = [], []
     buffer = b""
     file_offset_base = 0
     max_scan_bytes = max_scan_gb * 1024 * 1024 * 1024
+    
+    # [THÊM] Biến theo dõi phần trăm để tránh spam log
+    last_percent = -1
 
     try:
         with open(source_path, "rb") as f:
             while True:
                 if file_offset_base >= max_scan_bytes:
-                    print(f"[i] Dừng sau {max_scan_gb} GB (demo).")
                     break
 
                 chunk = safe_read(f, CHUNK_SIZE)
@@ -160,19 +166,38 @@ def carve_unified(source_path, max_scan_gb):
 
                         seen_ranges.append((abs_offset, abs_offset + len(data)))
 
+                      # === [CHÈN MỚI - PHIÊN BẢN DEBUG] ===
+                        try:
+                            # Gọi hàm từ file check.py
+                            integrity_score = check.analyze_file_integrity(out_path)
+                            integrity_str = f"{integrity_score:.2f}"
+                        except Exception as e:
+                            # In lỗi chi tiết ra màn hình đen (Console) để biết tại sao
+                            print(f"\n[!!!] Lỗi check file {filename}: {e}")
+                            # Ghi lỗi vào JSON để đọc
+                            integrity_str = f"Error: {e}"
+                        # ====================================
+                        # ===============================
+
                         # Ghi thông tin đầy đủ
-                        results.append({
+                        entry = {
                             "name": filename,
                             "full_path": os.path.abspath(source_path),
                             "offset": abs_offset,
                             "size": len(data),
                             "type": key,
                             "temp_path": os.path.abspath(out_path),
-                            "created": None,
-                            "modified": None,
-                            "status": None
-                        })
-                        print(f"[✓] {filename} @ {abs_offset} ({len(data)} bytes)")
+                            "integrity": integrity_str, # <--- THÊM DÒNG NÀY VÀO JSON
+                            "created": "",
+                            "modified": "",
+                            "status": "Carved"
+                        }
+                        # [THÊM] Key "Chi tiết" để giao diện hiển thị đúng bên panel phải
+                        entry["Chi tiết"] = entry.copy()
+                        
+                        results.append(entry)
+                        
+                        # print(f"[✓] {filename} @ {abs_offset} ({len(data)} bytes)", flush=True)
                         start = end
 
                 # Giữ lại phần cuối
@@ -181,25 +206,44 @@ def carve_unified(source_path, max_scan_gb):
                     buffer = buffer[-MAX_BUFFER:]
                 else:
                     file_offset_base += len(chunk)
+                
+                # ====================================================
+                # [THÊM] LOGIC TÍNH TOÁN VÀ GỬI TIẾN ĐỘ
+                # ====================================================
+                if max_scan_bytes > 0:
+                    percent = int((file_offset_base / max_scan_bytes) * 100)
+                    if percent > 100: percent = 100
+                    
+                    # Chỉ in nếu phần trăm thay đổi để đỡ lag
+                    if percent > last_percent:
+                        print(f"PROGRESS {percent}", flush=True)
+                        last_percent = percent
+                # ====================================================
 
     except Exception as e:
-        print(f"[❌] Lỗi đọc file/ổ đĩa: {e}")
+        print(f"[❌] Lỗi đọc file/ổ đĩa: {e}", flush=True)
 
     # Xuất JSON
     output_json = "deleted_files.json"
     if results:
         with open(output_json, "w", encoding="utf-8") as jf:
             json.dump(results, jf, indent=2, ensure_ascii=False)
-        print(f"[✅] Đã khôi phục {len(results)} file (kết quả lưu trong {output_json}).")
+        print(f"[✅] {len(results)} file ( {output_json}).", flush=True)
     else:
-        print("[⚠️] Không phát hiện file hợp lệ nào.")
+        print("[⚠️] Không phát hiện file hợp lệ nào.", flush=True)
+    
+    # [THÊM] Đảm bảo kết thúc luôn là 100%
+    print("PROGRESS 100", flush=True)
 
 
 # ▶️ Chạy chương trình
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Cách dùng: python carve_office_extended.py <device_or_image_path> [GB_demo]")
-        sys.exit(0)
-    drive = sys.argv[1]
-    size = float(sys.argv[2]) if len(sys.argv) > 2 else 56.3
-    carve_unified(drive, max_scan_gb=size)
+        print("Cách dùng: python quet_sau.py <device_or_image_path> [GB_demo]")
+        sys.exit(0) # Bỏ exit để tránh tắt bụp console nếu chạy test
+    else:
+        drive = sys.argv[1]
+        print(f"Checking path: {drive}") # Log để GUI bắt được
+        # Nếu không truyền size thì mặc định quét 1GB (hoặc số khác tùy bạn)
+        size = float(sys.argv[2]) if len(sys.argv) > 2 else 1
+        carve_unified(drive, max_scan_gb=size)
