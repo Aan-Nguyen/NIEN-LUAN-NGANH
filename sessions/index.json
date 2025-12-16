@@ -59,5 +59,17 @@
     "device_name": "FAT32",
     "timestamp": "20251103_153150",
     "file_path": "sessions\\session_FAT32_20251103_153150.json"
+  },
+  {
+    "session_name": "Phiên 20251216_165636",
+    "device_name": "USB__SanDisk_3.2Gen1_USB_Device",
+    "timestamp": "20251216_165636",
+    "file_path": "sessions\\session_USB__SanDisk_3.2Gen1_USB_Device_20251216_165636.json"
+  },
+  {
+    "session_name": "Phiên 20251217_002156",
+    "device_name": "USB__SanDisk_3.2Gen1_USB_Device",
+    "timestamp": "20251217_002156",
+    "file_path": "sessions\\session_USB__SanDisk_3.2Gen1_USB_Device_20251217_002156.json"
   }
 ]

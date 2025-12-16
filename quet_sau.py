@@ -101,49 +101,71 @@ TAIL_FINDERS = {
 
 
 def carve_unified(source_path, max_scan_gb):
-    print(f"{source_path}", flush=True)
-    
-    # [THÊM] Báo hiệu bắt đầu
+    print(f"Opening: {source_path}", flush=True)
     print("PROGRESS 0", flush=True)
     
-    results, seen_ranges = [], []
+    results = []
     buffer = b""
-    file_offset_base = 0
-    max_scan_bytes = max_scan_gb * 1024 * 1024 * 1024
     
-    # [THÊM] Biến theo dõi phần trăm để tránh spam log
+    # [QUAN TRỌNG] Biến theo dõi tổng số byte đã đọc từ file gốc
+    total_bytes_read = 0 
+    
+    max_scan_bytes = max_scan_gb * 1024 * 1024 * 1024
     last_percent = -1
 
     try:
         with open(source_path, "rb") as f:
             while True:
-                if file_offset_base >= max_scan_bytes:
+                # Kiểm tra giới hạn quét
+                if total_bytes_read >= max_scan_bytes:
                     break
 
+                # Đọc chunk mới
                 chunk = safe_read(f, CHUNK_SIZE)
                 if not chunk:
                     break
+                
                 buffer += chunk
+                total_bytes_read += len(chunk)
 
+                # [QUAN TRỌNG] Tính offset của đầu buffer hiện tại
+                # Buffer hiện tại bắt đầu tại vị trí: Tổng đã đọc - Độ dài buffer hiện có
+                buffer_start_offset = total_bytes_read - len(buffer)
+
+                # Duyệt qua các loại file cần tìm
                 for key, sig in SIGNATURES.items():
-                    start = 0
+                    search_pos = 0 # Vị trí tìm kiếm tương đối trong buffer
+                    
                     while True:
-                        start = buffer.find(sig["head"], start)
-                        if start == -1:
+                        # Tìm header
+                        start_rel = buffer.find(sig["head"], search_pos)
+                        if start_rel == -1:
                             break
 
-                        end = TAIL_FINDERS[sig["strategy"]](buffer, start, sig.get("tail"))
-                        if end is None:
-                            break
+                        # [QUAN TRỌNG] Tính Offset Tuyệt Đối CHÍNH XÁC
+                        abs_offset = buffer_start_offset + start_rel
 
-                        abs_offset = file_offset_base + start
-                        data = buffer[start:end]
+                        # Tìm tail
+                        end_rel = TAIL_FINDERS[sig["strategy"]](buffer, start_rel, sig.get("tail"))
+                        
+                        # Nếu không tìm thấy tail, hoặc file quá lớn vượt buffer -> bỏ qua tạm thời
+                        if end_rel is None:
+                            # Nếu buffer đã quá lớn mà vẫn chưa thấy tail, có thể file lỗi hoặc quá to
+                            # Ta skip header này để tránh vòng lặp vô tận
+                            if len(buffer) >= MAX_BUFFER:
+                                search_pos = start_rel + 1 
+                                continue
+                            else:
+                                # Chưa đủ dữ liệu, thoát vòng lặp tìm kiếm để đọc thêm chunk mới
+                                break
+                        
+                        # Trích xuất dữ liệu
+                        data = buffer[start_rel:end_rel]
 
-                        if any(s <= abs_offset <= e for s, e in seen_ranges):
-                            start = end
-                            continue
+                        # [Logic Kiểm tra trùng lặp offset nếu cần thiết]
+                        # (Bạn có thể thêm logic check seen_ranges ở đây nếu muốn)
 
-                        # Xác thực
+                        # Xác thực dữ liệu (Validate)
                         ok = False
                         if key in ("jpg", "png"):
                             ok = is_valid_image(data, key)
@@ -154,96 +176,73 @@ def carve_unified(source_path, max_scan_gb):
                         elif key in ("docx", "xlsx", "pptx"):
                             ok = is_valid_office_zip(data, key)
 
-                        if not ok:
-                            start = end
-                            continue
+                        if ok:
+                            # Xuất file
+                            filename = f"{key}_{abs_offset}.{sig['ext']}" # Đặt tên theo offset để dễ debug
+                            out_path = os.path.join(OUTPUT_DIR, filename)
+                            with open(out_path, "wb") as out:
+                                out.write(data)
 
-                        # Xuất file tạm
-                        filename = f"{key}_{len(results)+1}.{sig['ext']}"
-                        out_path = os.path.join(OUTPUT_DIR, filename)
-                        with open(out_path, "wb") as out:
-                            out.write(data)
+                            # Check Integrity
+                            integrity_str = "N/A"
+                            try:
+                                integrity_score = check.analyze_file_integrity(out_path)
+                                integrity_str = f"{integrity_score:.2f}"
+                            except Exception as e:
+                                integrity_str = f"Error: {e}"
 
-                        seen_ranges.append((abs_offset, abs_offset + len(data)))
+                            # Ghi kết quả
+                            entry = {
+                                "name": filename,
+                                "full_path": os.path.abspath(source_path),
+                                "offset": abs_offset, # [CHÍNH XÁC]
+                                "size": len(data),
+                                "type": key,
+                                "temp_path": os.path.abspath(out_path),
+                                "integrity": integrity_str,
+                                "status": "Carved"
+                            }
+                            entry["Chi tiết"] = entry.copy()
+                            results.append(entry)
+                            
+                            # Cập nhật vị trí tìm kiếm tiếp theo
+                            search_pos = end_rel
+                        else:
+                            # Nếu không valid, tìm tiếp từ ngay sau header
+                            search_pos = start_rel + 1
 
-                      # === [CHÈN MỚI - PHIÊN BẢN DEBUG] ===
-                        try:
-                            # Gọi hàm từ file check.py
-                            integrity_score = check.analyze_file_integrity(out_path)
-                            integrity_str = f"{integrity_score:.2f}"
-                        except Exception as e:
-                            # In lỗi chi tiết ra màn hình đen (Console) để biết tại sao
-                            print(f"\n[!!!] Lỗi check file {filename}: {e}")
-                            # Ghi lỗi vào JSON để đọc
-                            integrity_str = f"Error: {e}"
-                        # ====================================
-                        # ===============================
-
-                        # Ghi thông tin đầy đủ
-                        entry = {
-                            "name": filename,
-                            "full_path": os.path.abspath(source_path),
-                            "offset": abs_offset,
-                            "size": len(data),
-                            "type": key,
-                            "temp_path": os.path.abspath(out_path),
-                            "integrity": integrity_str, # <--- THÊM DÒNG NÀY VÀO JSON
-                            "created": "",
-                            "modified": "",
-                            "status": "Carved"
-                        }
-                        # [THÊM] Key "Chi tiết" để giao diện hiển thị đúng bên panel phải
-                        entry["Chi tiết"] = entry.copy()
-                        
-                        results.append(entry)
-                        
-                        # print(f"[✓] {filename} @ {abs_offset} ({len(data)} bytes)", flush=True)
-                        start = end
-
-                # Giữ lại phần cuối
-                if len(buffer) > MAX_BUFFER:
-                    file_offset_base += len(buffer) - MAX_BUFFER
-                    buffer = buffer[-MAX_BUFFER:]
-                else:
-                    file_offset_base += len(chunk)
+                # [CƠ CHẾ TRƯỢT BUFFER - SLIDING WINDOW]
+                # Giữ lại một phần cuối buffer để nối với chunk sau (phòng trường hợp file nằm giữa ranh giới 2 chunk)
+                # Kích thước giữ lại nên lớn hơn kích thước file lớn nhất kỳ vọng (ví dụ 10MB) 
+                # hoặc đơn giản là giữ lại một phần của MAX_BUFFER.
                 
-                # ====================================================
-                # [THÊM] LOGIC TÍNH TOÁN VÀ GỬI TIẾN ĐỘ
-                # ====================================================
+                KEEP_SIZE = 10 * 1024 * 1024 # Giữ lại 10MB cuối
+                if len(buffer) > KEEP_SIZE:
+                     buffer = buffer[-KEEP_SIZE:]
+                
+                # Cập nhật Progress
                 if max_scan_bytes > 0:
-                    percent = int((file_offset_base / max_scan_bytes) * 100)
+                    percent = int((total_bytes_read / max_scan_bytes) * 100)
                     if percent > 100: percent = 100
-                    
-                    # Chỉ in nếu phần trăm thay đổi để đỡ lag
                     if percent > last_percent:
                         print(f"PROGRESS {percent}", flush=True)
                         last_percent = percent
-                # ====================================================
 
     except Exception as e:
-        print(f"[❌] Lỗi đọc file/ổ đĩa: {e}", flush=True)
+        print(f"[❌] Error: {e}", flush=True)
 
-    # Xuất JSON
+    # Xuất JSON kết quả
     output_json = "deleted_files.json"
-    if results:
-        with open(output_json, "w", encoding="utf-8") as jf:
-            json.dump(results, jf, indent=2, ensure_ascii=False)
-        print(f"[✅] {len(results)} file ( {output_json}).", flush=True)
-    else:
-        print("[⚠️] Không phát hiện file hợp lệ nào.", flush=True)
+    with open(output_json, "w", encoding="utf-8") as jf:
+        json.dump(results, jf, indent=2, ensure_ascii=False)
     
-    # [THÊM] Đảm bảo kết thúc luôn là 100%
     print("PROGRESS 100", flush=True)
+    print(f"[✅] Done. Found {len(results)} files.", flush=True)
 
-
-# ▶️ Chạy chương trình
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Cách dùng: python quet_sau.py <device_or_image_path> [GB_demo]")
-        sys.exit(0) # Bỏ exit để tránh tắt bụp console nếu chạy test
+        print("Usage: python quet_sau.py <path> [GB]")
     else:
         drive = sys.argv[1]
-        print(f"Checking path: {drive}") # Log để GUI bắt được
-        # Nếu không truyền size thì mặc định quét 1GB (hoặc số khác tùy bạn)
         size = float(sys.argv[2]) if len(sys.argv) > 2 else 1
         carve_unified(drive, max_scan_gb=size)

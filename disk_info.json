@@ -18,7 +18,8 @@
           "free": "37.37 GB",
           "offset": 1048576,
           "path": "\\\\.\\F:",
-          "partition_index": 0
+          "partition_index": 0,
+          "type": "Logical"
         }
       ]
     },
@@ -33,14 +34,37 @@
       "index": 0,
       "volumes": [
         {
+          "letter": "N/A",
+          "label": "Hidden/System/Recovery",
+          "filesystem": "Unknown",
+          "size": "260.00 MB",
+          "free": "Unknown",
+          "offset": 1048576,
+          "path": "Partition0",
+          "partition_index": 0,
+          "type": "GPT: System"
+        },
+        {
           "letter": "C:",
           "label": "Windows-SSD",
           "filesystem": "NTFS",
           "size": "474.71 GB",
-          "free": "84.96 GB",
+          "free": "90.58 GB",
           "offset": 290455552,
           "path": "\\\\.\\C:",
-          "partition_index": 1
+          "partition_index": 1,
+          "type": "Logical"
+        },
+        {
+          "letter": "N/A",
+          "label": "Hidden/System/Recovery",
+          "filesystem": "Unknown",
+          "size": "1.95 GB",
+          "free": "Unknown",
+          "offset": 510012686336,
+          "path": "Partition2",
+          "partition_index": 2,
+          "type": "GPT: Unknown"
         }
       ]
     }

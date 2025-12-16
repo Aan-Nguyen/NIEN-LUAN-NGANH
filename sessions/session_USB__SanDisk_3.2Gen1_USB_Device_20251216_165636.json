@@ -1,0 +1,926 @@
+{
+  "target_info": {
+    "name": "PhysicalDrive1",
+    "vendor": "USB",
+    "model": "USB  SanDisk 3.2Gen1 USB Device",
+    "serial": "0901272b139b28742a7c",
+    "protocol": "USB",
+    "size": "57.71 GB",
+    "path": "\\\\.\\PhysicalDrive1",
+    "index": 1,
+    "volumes": [
+      {
+        "letter": "F:",
+        "label": "FAT32",
+        "filesystem": "FAT32",
+        "size": "57.70 GB",
+        "free": "37.37 GB",
+        "offset": 1048576,
+        "path": "\\\\.\\F:",
+        "partition_index": 0
+      }
+    ]
+  },
+  "scan_type": "deep",
+  "deleted_files_formatted": [
+    {
+      "Tên file": "jpg_1.jpg",
+      "Loại": "jpg",
+      "Size": 36050,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_1.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 619485860,
+        "size": 36050,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_1.jpg",
+        "integrity": "66.24",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_1.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 619485860,
+          "size": 36050,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_1.jpg",
+          "integrity": "66.24",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_2.jpg",
+      "Loại": "jpg",
+      "Size": 6681,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_2.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 620667889,
+        "size": 6681,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_2.jpg",
+        "integrity": "100.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_2.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 620667889,
+          "size": 6681,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_2.jpg",
+          "integrity": "100.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_3.jpg",
+      "Loại": "jpg",
+      "Size": 44090,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_3.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 735624818,
+        "size": 44090,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_3.jpg",
+        "integrity": "47.28",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_3.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 735624818,
+          "size": 44090,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_3.jpg",
+          "integrity": "47.28",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_4.jpg",
+      "Loại": "jpg",
+      "Size": 93166,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_4.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 735670643,
+        "size": 93166,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_4.jpg",
+        "integrity": "83.64",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_4.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 735670643,
+          "size": 93166,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_4.jpg",
+          "integrity": "83.64",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_5.jpg",
+      "Loại": "jpg",
+      "Size": 44362,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_5.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 739882687,
+        "size": 44362,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_5.jpg",
+        "integrity": "35.86",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_5.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 739882687,
+          "size": 44362,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_5.jpg",
+          "integrity": "35.86",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_6.jpg",
+      "Loại": "jpg",
+      "Size": 78107,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_6.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 739928698,
+        "size": 78107,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_6.jpg",
+        "integrity": "77.78",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_6.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 739928698,
+          "size": 78107,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_6.jpg",
+          "integrity": "77.78",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_7.jpg",
+      "Loại": "jpg",
+      "Size": 15366,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_7.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 740006981,
+        "size": 15366,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_7.jpg",
+        "integrity": "100.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_7.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 740006981,
+          "size": 15366,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_7.jpg",
+          "integrity": "100.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_8.jpg",
+      "Loại": "jpg",
+      "Size": 25222,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_8.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 746020131,
+        "size": 25222,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_8.jpg",
+        "integrity": "100.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_8.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 746020131,
+          "size": 25222,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_8.jpg",
+          "integrity": "100.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_9.jpg",
+      "Loại": "jpg",
+      "Size": 36163,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_9.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 746048483,
+        "size": 36163,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_9.jpg",
+        "integrity": "32.89",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_9.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 746048483,
+          "size": 36163,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_9.jpg",
+          "integrity": "32.89",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_10.jpg",
+      "Loại": "jpg",
+      "Size": 25910,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_10.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 746218777,
+        "size": 25910,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_10.jpg",
+        "integrity": "100.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_10.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 746218777,
+          "size": 25910,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_10.jpg",
+          "integrity": "100.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_11.jpg",
+      "Loại": "jpg",
+      "Size": 29246,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_11.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 746802223,
+        "size": 29246,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_11.jpg",
+        "integrity": "100.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_11.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 746802223,
+          "size": 29246,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_11.jpg",
+          "integrity": "100.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_12.jpg",
+      "Loại": "jpg",
+      "Size": 74416,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_12.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 746839953,
+        "size": 74416,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_12.jpg",
+        "integrity": "29.11",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_12.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 746839953,
+          "size": 74416,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_12.jpg",
+          "integrity": "29.11",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_13.jpg",
+      "Loại": "jpg",
+      "Size": 17401,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_13.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 791459298,
+        "size": 17401,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_13.jpg",
+        "integrity": "100.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_13.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 791459298,
+          "size": 17401,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_13.jpg",
+          "integrity": "100.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_14.jpg",
+      "Loại": "jpg",
+      "Size": 4689,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_14.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 793670134,
+        "size": 4689,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_14.jpg",
+        "integrity": "100.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_14.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 793670134,
+          "size": 4689,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_14.jpg",
+          "integrity": "100.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_15.jpg",
+      "Loại": "jpg",
+      "Size": 32376,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_15.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 796467379,
+        "size": 32376,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_15.jpg",
+        "integrity": "100.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_15.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 796467379,
+          "size": 32376,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_15.jpg",
+          "integrity": "100.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_16.jpg",
+      "Loại": "jpg",
+      "Size": 93750,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_16.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 814133452,
+        "size": 93750,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_16.jpg",
+        "integrity": "70.37",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_16.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 814133452,
+          "size": 93750,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_16.jpg",
+          "integrity": "70.37",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_17.jpg",
+      "Loại": "jpg",
+      "Size": 18100,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_17.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 818930750,
+        "size": 18100,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_17.jpg",
+        "integrity": "34.72",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_17.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 818930750,
+          "size": 18100,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_17.jpg",
+          "integrity": "34.72",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_18.jpg",
+      "Loại": "jpg",
+      "Size": 30142,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_18.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 822848848,
+        "size": 30142,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_18.jpg",
+        "integrity": "98.28",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_18.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 822848848,
+          "size": 30142,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_18.jpg",
+          "integrity": "98.28",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_19.jpg",
+      "Loại": "jpg",
+      "Size": 54867,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_19.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 826760217,
+        "size": 54867,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_19.jpg",
+        "integrity": "20.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_19.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 826760217,
+          "size": 54867,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_19.jpg",
+          "integrity": "20.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_20.jpg",
+      "Loại": "jpg",
+      "Size": 23157,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_20.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 833503750,
+        "size": 23157,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_20.jpg",
+        "integrity": "96.41",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_20.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 833503750,
+          "size": 23157,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_20.jpg",
+          "integrity": "96.41",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_21.jpg",
+      "Loại": "jpg",
+      "Size": 6109,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_21.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 836711777,
+        "size": 6109,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_21.jpg",
+        "integrity": "0.31",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_21.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 836711777,
+          "size": 6109,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_21.jpg",
+          "integrity": "0.31",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_22.jpg",
+      "Loại": "jpg",
+      "Size": 8269,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_22.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 836718091,
+        "size": 8269,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_22.jpg",
+        "integrity": "1.89",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_22.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 836718091,
+          "size": 8269,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_22.jpg",
+          "integrity": "1.89",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_23.jpg",
+      "Loại": "jpg",
+      "Size": 12566,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_23.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 841780275,
+        "size": 12566,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_23.jpg",
+        "integrity": "97.65",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_23.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 841780275,
+          "size": 12566,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_23.jpg",
+          "integrity": "97.65",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_24.jpg",
+      "Loại": "jpg",
+      "Size": 7511,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_24.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 847213288,
+        "size": 7511,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_24.jpg",
+        "integrity": "100.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_24.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 847213288,
+          "size": 7511,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_24.jpg",
+          "integrity": "100.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "jpg_25.jpg",
+      "Loại": "jpg",
+      "Size": 8098,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "jpg_25.jpg",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 847264606,
+        "size": 8098,
+        "type": "jpg",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_25.jpg",
+        "integrity": "100.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "jpg_25.jpg",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 847264606,
+          "size": 8098,
+          "type": "jpg",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\jpg_25.jpg",
+          "integrity": "100.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "webp_26.webp",
+      "Loại": "webp",
+      "Size": 15488,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "webp_26.webp",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 980014280,
+        "size": 15488,
+        "type": "webp",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\webp_26.webp",
+        "integrity": "0.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "webp_26.webp",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 980014280,
+          "size": 15488,
+          "type": "webp",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\webp_26.webp",
+          "integrity": "0.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "webp_27.webp",
+      "Loại": "webp",
+      "Size": 11010,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "webp_27.webp",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 980054840,
+        "size": 11010,
+        "type": "webp",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\webp_27.webp",
+        "integrity": "100.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "webp_27.webp",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 980054840,
+          "size": 11010,
+          "type": "webp",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\webp_27.webp",
+          "integrity": "100.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "webp_28.webp",
+      "Loại": "webp",
+      "Size": 14346,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "webp_28.webp",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 980066120,
+        "size": 14346,
+        "type": "webp",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\webp_28.webp",
+        "integrity": "100.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "webp_28.webp",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 980066120,
+          "size": 14346,
+          "type": "webp",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\webp_28.webp",
+          "integrity": "100.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    },
+    {
+      "Tên file": "webp_29.webp",
+      "Loại": "webp",
+      "Size": 11028,
+      "Ngày tạo": "",
+      "Tình trạng": "Carved",
+      "Chi tiết": {
+        "name": "webp_29.webp",
+        "full_path": "\\\\.\\PhysicalDrive1",
+        "offset": 980080744,
+        "size": 11028,
+        "type": "webp",
+        "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\webp_29.webp",
+        "integrity": "100.00",
+        "created": "",
+        "modified": "",
+        "status": "Carved",
+        "Chi tiết": {
+          "name": "webp_29.webp",
+          "full_path": "\\\\.\\PhysicalDrive1",
+          "offset": 980080744,
+          "size": 11028,
+          "type": "webp",
+          "temp_path": "c:\\NLN\\code\\Machine-Learning-Forensic-Application\\recovered_files\\webp_29.webp",
+          "integrity": "100.00",
+          "created": "",
+          "modified": "",
+          "status": "Carved"
+        }
+      }
+    }
+  ]
+}

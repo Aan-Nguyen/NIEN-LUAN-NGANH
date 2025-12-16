@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtWidgets import QStackedWidget, QTextEdit
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QDateTime
 from PyQt5.QtGui import QFont, QPixmap, QImage, QColor
+from dashboard import DashboardWidget
 import sys, json, subprocess, os, datetime, re
 from styles import get_app_stylesheet
 from config import MENU_ITEMS
@@ -44,6 +45,30 @@ def read_file_from_image(image_path, offset, size, max_preview=1024*100*100):
     except Exception as e:
         print(f"Lỗi đọc file '{image_path}':", e)
         return b""
+
+def get_best_offset(chi_tiet):
+    """
+    Ưu tiên offset (Deep Scan).
+    Fallback sang start_cluster (Quick Scan).
+    """
+    if not chi_tiet:
+        return 0
+
+    offset = chi_tiet.get("offset")
+    if offset is not None:
+        try:
+            return int(offset)
+        except Exception:
+            pass
+
+    cluster = chi_tiet.get("start_cluster")
+    if cluster is not None:
+        try:
+            return int(cluster)
+        except Exception:
+            pass
+
+    return 0
 
 class ScanWorker(QThread):
     file_found = pyqtSignal(dict)
@@ -327,8 +352,10 @@ class DetailPreviewPanel(QFrame):
 
         file_type = (chi_tiet.get("type") or "").lower()
         file_name = chi_tiet.get("name", "")
-        offset = chi_tiet.get("offset") or chi_tiet.get("start_cluster", 0)
+        offset = get_best_offset(chi_tiet)
         size = chi_tiet.get("size", 0)
+        data = read_file_from_image(image_path, offset, size)
+
 
         temp_dir = "recovered_files"
         temp_path = os.path.join(temp_dir, file_name)
@@ -396,19 +423,31 @@ class RecoverDeletedApp(QMainWindow):
             self.status_label.setText("Sẵn sàng. (Không có target)")
  
     def setupUI(self):
-        """Thiết lập bố cục 3 phần: Sidebar | Nội dung | Chi tiết."""
+        """Thiết lập bố cục chuẩn: Sidebar | StackedWidget"""
+        # 1. Layout tổng (Ngang)
         main_layout = QHBoxLayout(self.central_widget)
-        main_layout.setContentsMargins(0,0,0,0)
+        main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
 
+        # 2. Sidebar (Bên trái)
         self.setup_side_bar(main_layout)
 
+        # 3. Stacked Widget (Bên phải - Chứa các trang)
+        self.stack = QStackedWidget()
+
+        # --- TRANG 0: FILES VIEW (Bảng + Chi tiết) ---
+        self.page_files = QWidget()
+        files_layout = QHBoxLayout(self.page_files) # Layout của trang 0
+        files_layout.setContentsMargins(0, 0, 0, 0)
+        files_layout.setSpacing(0)
+
+        # Setup phần Bảng (Content Frame)
         content_layout = QVBoxLayout()
         content_layout.setSpacing(10)
         content_layout.setContentsMargins(20, 20, 20, 20)
         self.setup_top_bar(content_layout)
         self.setup_table(content_layout)
-
+        
         self.status_label = QLabel("Sẵn sàng.")
         self.status_label.setObjectName("statusLabel")
         content_layout.addWidget(self.status_label)
@@ -417,14 +456,29 @@ class RecoverDeletedApp(QMainWindow):
         content_frame.setLayout(content_layout)
         content_frame.setObjectName("mainContentFrame")
 
-        main_layout.addWidget(content_frame, stretch=3)
-
+        # Setup phần Chi tiết (Detail Panel)
         self.detail_panel = DetailPreviewPanel()
-        main_layout.addWidget(self.detail_panel, stretch=2)
 
+        # ### <--- SỬA Ở ĐÂY: Add vào files_layout (trang con), KHÔNG add vào main_layout
+        files_layout.addWidget(content_frame, stretch=3)
+        files_layout.addWidget(self.detail_panel, stretch=2)
+
+        # --- TRANG 1: DASHBOARD ---
+        self.page_dashboard = QWidget()
+        self.dashboard_layout_container = QVBoxLayout(self.page_dashboard)
+        self.dashboard_layout_container.setContentsMargins(0, 0, 0, 0)
+
+        # --- Đưa 2 trang vào Stack ---
+        self.stack.addWidget(self.page_files)     # Index 0
+        self.stack.addWidget(self.page_dashboard) # Index 1
+
+        # ### <--- SỬA Ở ĐÂY: Chỉ add Stack vào layout chính
+        main_layout.addWidget(self.stack)
+
+        # Kết nối sự kiện
         self.table.currentCellChanged.connect(self.handle_cell_change)
         self.detail_panel.recover_btn.clicked.connect(self.recover_file)
-
+        
     def setup_side_bar(self, parent_layout):
         """Tạo thanh sidebar bên trái."""
         side_bar = QVBoxLayout()
@@ -432,11 +486,12 @@ class RecoverDeletedApp(QMainWindow):
         side_bar.setAlignment(Qt.AlignTop)
         side_bar.setContentsMargins(15, 20, 15, 20)
 
-        title_label = QLabel("🗂 <b>Scanning</b>", alignment=Qt.AlignCenter)
+        title_label = QLabel("🗂 <b>Forensic Tool</b>", alignment=Qt.AlignCenter)
         title_label.setFont(QFont("Segoe UI", 16, QFont.Bold))
         side_bar.addWidget(title_label)
         side_bar.addSpacing(15)
 
+        # --- 1. NÚT HOME (Giữ nguyên: Thoát về giao diện chọn ổ đĩa) ---
         home_btn = QPushButton("🏠 Home")
         home_btn.setObjectName("homeBtn")
         home_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4, color=QColor(0, 0, 0, 70)))
@@ -444,38 +499,73 @@ class RecoverDeletedApp(QMainWindow):
         home_btn.clicked.connect(self.go_home)
         side_bar.addWidget(home_btn)
 
+        # --- Kẻ ngang phân cách ---
+        line1 = QFrame()
+        line1.setFrameShape(QFrame.HLine)
+        line1.setFrameShadow(QFrame.Sunken)
+        side_bar.addWidget(line1)
+
+        # ============================================================
+        # --- (MỚI) NHÓM 2: CHUYỂN ĐỔI GIAO DIỆN (VIEW) ---
+        # ============================================================
+        lbl_view = QLabel("Chế độ xem:")
+        lbl_view.setStyleSheet("color: #888; font-weight: bold; margin-top: 5px; margin-bottom: 5px;")
+        side_bar.addWidget(lbl_view)
+
+        # Nút 1: Xem Bảng (Quay về Index 0)
+        self.btn_view_list = QPushButton("📄 Danh sách File")
+        self.btn_view_list.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4))
+        self.btn_view_list.setFixedHeight(35)
+        # Bấm vào thì hiện Stack trang 0
+        self.btn_view_list.clicked.connect(lambda: self.stack.setCurrentIndex(0))
+        side_bar.addWidget(self.btn_view_list)
+
+        # Nút 2: Xem Dashboard (Sang Index 1)
+        self.btn_view_dash = QPushButton("📊 Dashboard")
+        self.btn_view_dash.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4))
+        self.btn_view_dash.setFixedHeight(35)
+        # Bấm vào thì gọi hàm show_dashboard
+        self.btn_view_dash.clicked.connect(self.show_dashboard)
+        side_bar.addWidget(self.btn_view_dash)
+        
+        # --- Kẻ ngang phân cách ---
+        line2 = QFrame()
+        line2.setFrameShape(QFrame.HLine)
+        line2.setFrameShadow(QFrame.Sunken)
+        side_bar.addWidget(line2)
+        # ============================================================
+
+        # --- 3. CÁC NÚT CHỨC NĂNG (Giữ nguyên) ---
         rescan_btn = QPushButton("🔄 Quét lại")
         rescan_btn.setObjectName("rescanBtn")
-        rescan_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4)) 
+        rescan_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4))
         rescan_btn.setFixedHeight(40)
         rescan_btn.clicked.connect(self.start_scan)
         side_bar.addWidget(rescan_btn)
 
         save_btn = QPushButton("💾 Lưu phiên")
         save_btn.setObjectName("saveBtn")
-        save_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4)) 
+        save_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4))
         save_btn.setFixedHeight(40)
         save_btn.clicked.connect(self.save_session)
         side_bar.addWidget(save_btn)
         
-        # ---------- (THÊM MỚI) ----------
         recover_all_btn = QPushButton("♻️ Khôi phục tất cả")
-        recover_all_btn.setObjectName("recoverAllBtn") # ID cho QSS (ví dụ: nút màu xanh)
+        recover_all_btn.setObjectName("recoverAllBtn") 
         recover_all_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4))
         recover_all_btn.setFixedHeight(40)
         recover_all_btn.clicked.connect(self.recover_all_files)
         side_bar.addWidget(recover_all_btn)
-        # ---------------------------------
 
         side_bar.addStretch()
 
-        side_frame = QFrame() 
-        side_frame.setLayout(side_bar) 
-        side_frame.setFixedWidth(240) 
+        side_frame = QFrame()
+        side_frame.setLayout(side_bar)
+        side_frame.setFixedWidth(240)
         side_frame.setObjectName("sidebar")
         
         parent_layout.addWidget(side_frame)
-
+    
     def setup_top_bar(self, parent_layout):
         """Hàm helper để tạo top bar (nút + tìm kiếm)."""
         top_bar = QHBoxLayout()
@@ -703,7 +793,7 @@ class RecoverDeletedApp(QMainWindow):
                 return
 
             image_path = self.target_info.get("path")
-            offset = chi_tiet.get("offset", 0)
+            offset = get_best_offset(chi_tiet)
             size = chi_tiet.get("size", 0)
             data = read_file_from_image(image_path, offset, size)
 
@@ -787,7 +877,7 @@ class RecoverDeletedApp(QMainWindow):
                         dst.write(src.read())
                 else:
                     # Chúng ta đã check image_path ở trên
-                    offset = chi_tiet.get("offset", 0)
+                    offset = get_best_offset(chi_tiet)
                     size = chi_tiet.get("size", 0)
                     data = read_file_from_image(image_path, offset, size)
                     with open(output_path, "wb") as f:
@@ -917,44 +1007,124 @@ class RecoverDeletedApp(QMainWindow):
             QMessageBox.critical(self, "Lỗi", f"Không thể tải phiên:\n{e}")
 
     def go_home(self):
-        # 1. Kiểm tra trạng thái quét đáng tin cậy hơn (dùng self.is_scanning nếu đã thêm)
-        is_running = hasattr(self, 'worker') and (self.is_scanning if hasattr(self, 'is_scanning') else self.worker.isRunning())
-        
-        if is_running:
-            reply = QMessageBox.question(
-                self, "Dừng quét?",
-                "Quá trình quét đang chạy. Bạn có chắc muốn dừng quét và quay về Home?",
-                QMessageBox.Yes | QMessageBox.No, QMessageBox.No
-            )
-            
-            if reply == QMessageBox.No:
-                return  
-
-            self.worker.stop()
-            self.worker.wait()
-        
-        self.home_requested.emit()
-        
-        # 3. Logic dọn dẹp (giữ nguyên)
-        temp_dir = "recovered_files"
-        if os.path.exists(temp_dir):
-             try:
-                 # ... (logic dọn dẹp)
-                 print(f"[CLEANUP] Đã xóa tất cả file trong thư mục tạm: {temp_dir}")
-             except Exception as e:
-                 print(f"[LỖI] Không thể xóa thư mục tạm ({temp_dir}): {e}")
-    
-    def closeEvent(self, event):
+        # Nếu đang quét thì hỏi
         if hasattr(self, 'worker') and self.worker.isRunning():
             reply = QMessageBox.question(
                 self, "Dừng quét?",
-                "Quá trình quét đang chạy. Bạn có chắc muốn thoát và dừng quét?",
-                QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+                "Quá trình quét đang chạy. Bạn có chắc muốn quay về Home?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No
             )
             if reply == QMessageBox.No:
-                event.ignore() 
                 return
+
+            self.worker.stop()
+            self.worker.wait()
+
+        # ✅ CHỈ XÓA FILE TẠM
+        self.cleanup_recovered_files()
+
+        # ❌ KHÔNG đụng deleted_files
+        # ❌ KHÔNG reset table
+
+        self.home_requested.emit()
+    
+   # ... (Trong class RecoverDeletedApp) ...
+    def cleanup_recovered_files(self):
+        temp_dir = "recovered_files"
+        if not os.path.exists(temp_dir):
+            return
+
+        try:
+            for fname in os.listdir(temp_dir):
+                fpath = os.path.join(temp_dir, fname)
+                if os.path.isfile(fpath):
+                    os.remove(fpath)
+            print("[CLEANUP] Đã xóa toàn bộ file trong recovered_files/")
+        except Exception as e:
+            print(f"[LỖI] Cleanup recovered_files thất bại: {e}")
+
+    def show_dashboard(self):
+        """Hiển thị Dashboard và kết nối sự kiện click"""
+        self.stack.setCurrentIndex(1)
+        
+        # Xóa cũ
+        while self.dashboard_layout_container.count():
+            child = self.dashboard_layout_container.takeAt(0)
+            if child.widget(): child.widget().deleteLater()
+        
+        try:
+            dashboard = DashboardWidget() 
+            # [QUAN TRỌNG] Kết nối tín hiệu từ Dashboard
+            dashboard.filter_requested.connect(self.handle_dashboard_filter)
+            
+            self.dashboard_layout_container.addWidget(dashboard, 1) 
+        except Exception as e:
+            self.dashboard_layout_container.addWidget(QLabel(f"Lỗi: {e}"))
+
+
+    def handle_dashboard_filter(self, category):
+     
+        print(f"User selected category: {category}") # Debug
+        
+        # 1. Chuyển về trang danh sách file (Index 0)
+        self.stack.setCurrentIndex(0)
+        
+        # 2. Reset ô tìm kiếm
+        self.search_box.clear()
+        self.search_box.setText(category) 
+        
+        # Nếu bạn muốn filter CHÍNH XÁC theo cột Loại (Cột 1), hãy sửa hàm filter_table:
+        self.filter_table_by_type(category)
+
+    def filter_table_by_type(self, category):
+        """Hàm lọc nâng cao chỉ dựa trên cột Loại (Cột 1)"""
+        # Định nghĩa các đuôi file cho từng nhóm
+        extensions = {
+            "Image": ['jpg','jpeg','png','bmp','gif','webp','svg','tiff'],
+            "Document": ['doc','docx','pdf','txt','xls','xlsx','ppt','pptx'],
+            "Music": ['mp3','wav','flac','aac','ogg'],
+            "Archive": ['zip','rar','7z','tar','gz','iso'],
+            "Other": [] # Other là cái còn lại
+        }
+        
+        target_exts = extensions.get(category, [])
+        
+        for row in range(self.table.rowCount()):
+            # Lấy item cột Loại (Cột 1)
+            type_item = self.table.item(row, 1) 
+            if not type_item: continue
+            
+            file_type = type_item.text().lower()
+            
+            should_show = False
+            if category == "Other":
+                # Nếu là Other, hiện những cái KHÔNG nằm trong các nhóm trên
+                all_known = [e for sublist in extensions.values() for e in sublist]
+                if file_type not in all_known: should_show = True
             else:
-                self.worker.stop() # <-- Gọi stop() đã được sửa đổi
-                self.worker.wait() # <-- Chờ ScanWorker kết thúc
+                # Nếu thuộc danh sách đuôi file của nhóm đó
+                if file_type in target_exts: should_show = True
+            
+            self.table.setRowHidden(row, not should_show)
+               
+    def closeEvent(self, event):
+        if hasattr(self, 'worker') and self.worker.isRunning():
+            reply = QMessageBox.question(
+                self,
+                "Thoát ứng dụng?",
+                "Quá trình quét đang chạy. Bạn có chắc muốn thoát?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No
+            )
+            if reply == QMessageBox.No:
+                event.ignore()
+                return
+
+            self.worker.stop()
+            self.worker.wait()
+
+        # ✅ THOÁT LÀ XÓA FILE TẠM
+        self.cleanup_recovered_files()
+
         event.accept()
