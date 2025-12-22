@@ -1,0 +1,7 @@
+2025-12-22 04:20:35 - INFO - Bắt đầu quét: DEEP trên \\.\C: (NTFS)
+2025-12-22 04:21:16 - INFO - Quá trình quét hoàn tất. Tìm thấy 7161 file.
+2025-12-22 04:22:07 - INFO - Đang khôi phục file: jpg_9273344.jpg -> F:/jpg_9273344.jpg
+2025-12-22 04:22:09 - INFO - Thành công: Copy từ file tạm (jpg_9273344.jpg)
+2025-12-22 04:22:16 - INFO - Đang khôi phục file: jpg_9961472.jpg -> C:/NLN/code/Machine-Learning-Forensic-Application/jpg_9961472.jpg
+2025-12-22 04:22:20 - INFO - Thành công: Copy từ file tạm (jpg_9961472.jpg)
+2025-12-22 04:22:26 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)

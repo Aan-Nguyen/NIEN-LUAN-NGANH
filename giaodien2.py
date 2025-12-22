@@ -13,7 +13,24 @@ import sys, json, subprocess, os, datetime, re
 from styles import get_app_stylesheet
 from config import MENU_ITEMS
 from utils import format_size # Giả định format_size, NumericItem được import từ utils
+import logging # <-- Import thư viện logging
 
+# --- CẤU HÌNH GHI LOG (Thêm đoạn này vào) ---
+# Log sẽ được lưu vào file 'activity_log.txt' cùng thư mục
+logging.basicConfig(
+    filename='activity_log.txt',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    encoding='utf-8' 
+)
+
+def log_action(message, level="info"):
+    """Hàm ghi log hỗ trợ"""
+    if level == "info": logging.info(message)
+    elif level == "error": logging.error(message)
+    elif level == "warning": logging.warning(message)
+    print(f"[{level.upper()}] {message}") # Vẫn in ra màn hình console để debug
 # (Giữ nguyên DropShadowEffect và NumericItem)
 class DropShadowEffect(QGraphicsDropShadowEffect):
     def __init__(self, color=QColor(0, 0, 0, 80), blur_radius=15, x_offset=0, y_offset=6):
@@ -85,7 +102,7 @@ class ScanWorker(QThread):
     def run(self):
         image_path = self.target_info.get("path")
         fs_type = self.target_info.get("filesystem", "").upper()
-
+        log_action(f"Bắt đầu quét: {self.scan_type.upper()} trên {image_path} ({fs_type})")
         # 1. Lấy đường dẫn tuyệt đối của thư mục chứa file giaodien2.py
         base_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -154,6 +171,7 @@ class ScanWorker(QThread):
                 return
 
         except Exception as e:
+            log_action(f"Lỗi quá trình quét (ScanWorker): {e}", "error")
             print("Lỗi khi chạy subprocess:", e)
             self.finished.emit()
             return
@@ -189,7 +207,7 @@ class ScanWorker(QThread):
                 "Chi tiết": f
             }
             self.file_found.emit(file_info)
-
+        log_action(f"Quá trình quét hoàn tất. Tìm thấy {len(all_files)} file.") # <--- Thêm dòng này
         self.finished.emit()
 
     def stop(self):
@@ -783,6 +801,7 @@ class RecoverDeletedApp(QMainWindow):
             return
 
         try:
+            log_action(f"Đang khôi phục file: {file_name} -> {save_path}") # <--- Thêm dòng này
             if os.path.exists(temp_path):
                 with open(temp_path, "rb") as src, open(save_path, "wb") as dst:
                     dst.write(src.read())
@@ -790,6 +809,7 @@ class RecoverDeletedApp(QMainWindow):
                     self, "Hoàn tất",
                     f"File đã được khôi phục (copy từ file tạm):\n{save_path}"
                 )
+                log_action(f"Thành công: Copy từ file tạm ({file_name})") # <--- Thêm dòng này
                 return
 
             image_path = self.target_info.get("path")
@@ -803,8 +823,9 @@ class RecoverDeletedApp(QMainWindow):
                 self, "Hoàn tất",
                 f"File đã được khôi phục (đọc từ image):\n{save_path}"
             )
-
+            log_action(f"Thành công: Đọc trực tiếp từ ổ đĩa ({file_name})") # <--- Thêm dòng này
         except Exception as e:
+            log_action(f"Thất bại khi khôi phục {file_name}: {e}", "error") # <--- Thêm dòng này
             QMessageBox.warning(self, "Lỗi", f"Không thể khôi phục file:\n{e}")
 
     def recover_all_files(self):
@@ -845,7 +866,7 @@ class RecoverDeletedApp(QMainWindow):
 
         self.status_label.setText(f"Đang chuẩn bị khôi phục {total_files} file...")
         QApplication.processEvents()
-
+        log_action(f"Bắt đầu khôi phục tất cả ({len(self.deleted_files)} files) vào: {save_dir}") # <--- Thêm dòng này
         for i, file_info in enumerate(self.deleted_files):
             self.status_label.setText(f"Đang khôi phục {i+1}/{total_files}...")
             QApplication.processEvents() # Cho phép UI cập nhật
@@ -882,11 +903,12 @@ class RecoverDeletedApp(QMainWindow):
                     data = read_file_from_image(image_path, offset, size)
                     with open(output_path, "wb") as f:
                         f.write(data)
-                
+                log_action(f"[Thành công] Khôi phục file {file_name} -> {output_path}") # <--- Thêm dòng này
                 success_count += 1
             
             except Exception as e:
                 print(f"[Lỗi] Khôi phục file {file_name} thất bại: {e}")
+                log_action(f"Lỗi khôi phục file {file_name}: {e}", "error") # <--- Thêm dòng này
                 fail_count += 1
         
         self.status_label.setText(f"Hoàn tất! Khôi phục thành công {success_count}/{total_files} file.")
@@ -895,7 +917,7 @@ class RecoverDeletedApp(QMainWindow):
                               f"Thành công: {success_count}\n"
                               f"Thất bại: {fail_count}\n\n"
                               f"File được lưu tại: {save_dir}")
-
+        log_action(f"Kết thúc khôi phục hàng loạt. Thành công: {success_count}, Lỗi: {fail_count}") # <--- Thêm dòng này
     def filter_table(self, text):
         text = text.strip().lower()
         for row in range(self.table.rowCount()):
@@ -1040,10 +1062,9 @@ class RecoverDeletedApp(QMainWindow):
                 fpath = os.path.join(temp_dir, fname)
                 if os.path.isfile(fpath):
                     os.remove(fpath)
-            print("[CLEANUP] Đã xóa toàn bộ file trong recovered_files/")
+            log_action("Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)") # <--- Thay print bằng log_action
         except Exception as e:
-            print(f"[LỖI] Cleanup recovered_files thất bại: {e}")
-
+            log_action(f"Lỗi dọn dẹp file tạm: {e}", "error") #
     def show_dashboard(self):
         """Hiển thị Dashboard và kết nối sự kiện click"""
         self.stack.setCurrentIndex(1)

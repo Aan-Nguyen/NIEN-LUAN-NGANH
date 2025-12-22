@@ -2,7 +2,7 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
     QPushButton, QLabel, QMessageBox, QFrame, QHeaderView,
-    QGraphicsDropShadowEffect, QAbstractItemView
+    QGraphicsDropShadowEffect, QAbstractItemView, QDialog, QTextEdit
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont, QColor 
@@ -62,6 +62,14 @@ class SessionManagerApp(QWidget):
         # Nút Xóa phiên
         self.delete_btn = QPushButton("🗑 Xóa phiên")
         self.delete_btn.setObjectName("deleteSessionBtn") 
+        
+        # --- [THÊM MỚI] NÚT XEM LOG ---
+        self.log_btn = QPushButton("📜 Xem Log")
+        self.log_btn.setObjectName("viewLogBtn") # Bạn có thể thêm style cho ID này trong styles.py nếu muốn
+        self.log_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4))
+        self.log_btn.setFixedHeight(40)
+        self.log_btn.clicked.connect(self.view_log_file) # Kết nối tới hàm xử lý
+        sidebar_layout.addWidget(self.log_btn)
         # ÁP DỤNG EFFECT - LOẠI BỎ MÀU CỨNG
         self.delete_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4)) 
         self.delete_btn.setFixedHeight(40)
@@ -229,3 +237,33 @@ class SessionManagerApp(QWidget):
     # ===================== GO HOME (GIỮ NGUYÊN LOGIC) =====================
     def go_home(self):
         self.home_requested.emit()
+    
+    def view_log_file(self):
+        log_path = "activity_log.txt"
+        
+        if not os.path.exists(log_path):
+            QMessageBox.information(self, "Thông báo", "Chưa có nhật ký hoạt động (File log chưa được tạo).")
+            return
+
+        try:
+            with open(log_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            
+            # Tạo cửa sổ Popup đơn giản
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Nhật ký hoạt động (Activity Log)")
+            dialog.resize(700, 500)
+            
+            layout = QVBoxLayout(dialog)
+            
+            text_edit = QTextEdit()
+            text_edit.setPlainText(content)
+            text_edit.setReadOnly(True) # Chỉ đọc, không cho sửa
+            text_edit.setFont(QFont("Consolas", 10)) # Font monospaced cho dễ nhìn log
+            
+            layout.addWidget(text_edit)
+            
+            dialog.exec_()
+            
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi", f"Không thể đọc file log:\n{e}")

@@ -49,7 +49,7 @@
           "label": "Windows-SSD",
           "filesystem": "NTFS",
           "size": "474.71 GB",
-          "free": "90.58 GB",
+          "free": "83.13 GB",
           "offset": 290455552,
           "path": "\\\\.\\C:",
           "partition_index": 1,
