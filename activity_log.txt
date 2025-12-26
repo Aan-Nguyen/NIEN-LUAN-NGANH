@@ -1,7 +1,109 @@
-2025-12-22 04:20:35 - INFO - Bắt đầu quét: DEEP trên \\.\C: (NTFS)
-2025-12-22 04:21:16 - INFO - Quá trình quét hoàn tất. Tìm thấy 7161 file.
-2025-12-22 04:22:07 - INFO - Đang khôi phục file: jpg_9273344.jpg -> F:/jpg_9273344.jpg
-2025-12-22 04:22:09 - INFO - Thành công: Copy từ file tạm (jpg_9273344.jpg)
-2025-12-22 04:22:16 - INFO - Đang khôi phục file: jpg_9961472.jpg -> C:/NLN/code/Machine-Learning-Forensic-Application/jpg_9961472.jpg
-2025-12-22 04:22:20 - INFO - Thành công: Copy từ file tạm (jpg_9961472.jpg)
-2025-12-22 04:22:26 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-24 11:11:59 - INFO - Bắt đầu quét: QUICK trên \\.\D: (NTFS)
+2025-12-24 11:12:03 - INFO - Quá trình quét hoàn tất. Tìm thấy 4 file.
+2025-12-24 15:50:40 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-24 15:50:48 - INFO - Bắt đầu quét: QUICK trên \\.\F: (FAT32)
+2025-12-24 15:50:55 - INFO - Quá trình quét hoàn tất. Tìm thấy 186 file.
+2025-12-24 15:55:30 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-24 15:55:35 - INFO - Bắt đầu quét: QUICK trên \\.\F: (FAT32)
+2025-12-24 15:55:36 - INFO - Quá trình quét hoàn tất. Tìm thấy 0 file.
+2025-12-24 16:46:39 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-24 16:46:45 - INFO - Bắt đầu quét: QUICK trên \\.\F: (FAT32)
+2025-12-24 16:46:45 - INFO - Quá trình quét hoàn tất. Tìm thấy 1 file.
+2025-12-24 16:47:38 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-24 16:47:52 - INFO - Bắt đầu quét: DEEP trên \\.\F: (FAT32)
+2025-12-24 16:48:50 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-24 16:49:15 - INFO - Bắt đầu quét: DEEP trên \\.\F: (FAT32)
+2025-12-24 16:59:52 - INFO - Quá trình quét hoàn tất. Tìm thấy 27347 file.
+2025-12-24 17:31:33 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-24 17:31:39 - INFO - Bắt đầu quét: QUICK trên \\.\F: (FAT32)
+2025-12-24 17:31:40 - INFO - Quá trình quét hoàn tất. Tìm thấy 1 file.
+2025-12-24 19:52:02 - INFO - Bắt đầu quét: QUICK trên \\.\F: (FAT32)
+2025-12-24 19:52:36 - INFO - Quá trình quét hoàn tất. Tìm thấy 1568 file.
+2025-12-24 20:03:11 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-24 20:03:15 - INFO - Bắt đầu quét: DEEP trên \\.\F: (FAT32)
+2025-12-24 20:03:19 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-24 20:03:51 - INFO - Bắt đầu quét: DEEP trên \\.\F: (FAT32)
+2025-12-24 20:16:55 - INFO - Quá trình quét hoàn tất. Tìm thấy 27322 file.
+2025-12-24 23:01:10 - INFO - Bắt đầu quét: QUICK trên \\.\F: (NTFS)
+2025-12-24 23:01:10 - INFO - Quá trình quét hoàn tất. Tìm thấy 0 file.
+2025-12-24 23:02:06 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-24 23:02:12 - INFO - Bắt đầu quét: DEEP trên \\.\F: (NTFS)
+2025-12-24 23:16:22 - INFO - Quá trình quét hoàn tất. Tìm thấy 26893 file.
+2025-12-24 23:28:02 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-24 23:28:18 - INFO - Bắt đầu quét: QUICK trên \\.\F: (NTFS)
+2025-12-24 23:28:18 - INFO - Quá trình quét hoàn tất. Tìm thấy 0 file.
+2025-12-25 00:19:29 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-25 00:21:57 - INFO - Bắt đầu quét: QUICK trên \\.\F: (NTFS)
+2025-12-25 00:21:57 - INFO - Quá trình quét hoàn tất. Tìm thấy 0 file.
+2025-12-25 01:56:42 - INFO - Bắt đầu quét: QUICK trên \\.\F: (NTFS)
+2025-12-25 01:56:42 - INFO - Quá trình quét hoàn tất. Tìm thấy 0 file.
+2025-12-25 01:56:47 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-25 01:56:58 - INFO - Bắt đầu quét: DEEP trên \\.\F: (NTFS)
+2025-12-25 02:00:11 - INFO - Quá trình quét hoàn tất. Tìm thấy 336 file.
+2025-12-25 02:01:02 - INFO - Bắt đầu quét: DEEP trên \\.\F: (NTFS)
+2025-12-25 02:01:25 - INFO - Bắt đầu quét: DEEP trên \\.\F: (NTFS)
+2025-12-25 02:04:54 - INFO - Quá trình quét hoàn tất. Tìm thấy 1620 file.
+2025-12-25 02:05:12 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-25 02:05:36 - INFO - Bắt đầu quét: DEEP trên \\.\F: (NTFS)
+2025-12-25 02:29:06 - INFO - Quá trình quét hoàn tất. Tìm thấy 6724 file.
+2025-12-25 22:37:54 - INFO - Bắt đầu quét: QUICK trên \\.\C: (NTFS)
+2025-12-25 22:42:11 - INFO - Quá trình quét hoàn tất. Tìm thấy 77221 file.
+2025-12-25 22:50:34 - INFO - Bắt đầu quét: QUICK trên \\.\H: (NTFS)
+2025-12-25 22:50:34 - INFO - Quá trình quét hoàn tất. Tìm thấy 0 file.
+2025-12-25 22:50:38 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-25 22:51:34 - INFO - Bắt đầu quét: QUICK trên \\.\D: (NTFS)
+2025-12-25 22:51:41 - INFO - Quá trình quét hoàn tất. Tìm thấy 12 file.
+2025-12-25 22:52:01 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-25 22:53:58 - INFO - Bắt đầu quét: QUICK trên \\.\D: (NTFS)
+2025-12-25 22:53:59 - INFO - Quá trình quét hoàn tất. Tìm thấy 0 file.
+2025-12-25 22:54:05 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-25 22:54:11 - INFO - Bắt đầu quét: DEEP trên \\.\D: (NTFS)
+2025-12-25 22:55:07 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-25 22:55:13 - INFO - Bắt đầu quét: QUICK trên \\.\D: (NTFS)
+2025-12-25 22:56:06 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-25 22:56:09 - INFO - Bắt đầu quét: QUICK trên \\.\D: (NTFS)
+2025-12-25 22:57:13 - INFO - Quá trình quét hoàn tất. Tìm thấy 571 file.
+2025-12-25 22:58:24 - ERROR - Thất bại khi khôi phục $R6WGLY8.png: Cố gắng lưu trên cùng ổ đĩa với nguồn
+2025-12-25 22:58:31 - INFO - Đang khôi phục file: $R6WGLY8.png -> C:/$R6WGLY8.png
+2025-12-25 22:58:33 - INFO - Thành công: Đọc trực tiếp từ ổ đĩa ($R6WGLY8.png)
+2025-12-25 23:00:21 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-25 23:00:33 - INFO - Bắt đầu quét: QUICK trên \\.\C: (NTFS)
+2025-12-25 23:03:32 - INFO - Quá trình quét hoàn tất. Tìm thấy 81053 file.
+2025-12-25 23:03:58 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-25 23:04:57 - INFO - Bắt đầu quét: DEEP trên \\.\F: (FAT32)
+2025-12-25 23:06:10 - INFO - Quá trình quét hoàn tất. Tìm thấy 262 file.
+2025-12-25 23:13:23 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-25 23:14:15 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-26 09:50:52 - INFO - Bắt đầu quét: QUICK trên \\.\H: (NTFS)
+2025-12-26 09:50:53 - INFO - Quá trình quét hoàn tất. Tìm thấy 15 file.
+2025-12-26 09:51:39 - INFO - Đang khôi phục file: 01 - MHUD_GT-đã gộp.pdf -> C:/NLN/code/Machine-Learning-Forensic-Application/01 - MHUD_GT-đã gộp.pdf
+2025-12-26 09:51:41 - INFO - Thành công: Đọc trực tiếp từ ổ đĩa (01 - MHUD_GT-đã gộp.pdf)
+2025-12-26 09:52:16 - INFO - Đang khôi phục file: 01 - MHUD_GT-đã gộp.pdf -> C:/01 - MHUD_GT-đã gộp.pdf
+2025-12-26 09:52:18 - INFO - Thành công: Đọc trực tiếp từ ổ đĩa (01 - MHUD_GT-đã gộp.pdf)
+2025-12-26 09:55:24 - INFO - Bắt đầu quét: QUICK trên \\.\H: (NTFS)
+2025-12-26 09:55:25 - INFO - Quá trình quét hoàn tất. Tìm thấy 16 file.
+2025-12-26 09:57:37 - INFO - Bắt đầu quét: QUICK trên \\.\H: (NTFS)
+2025-12-26 09:57:38 - INFO - Quá trình quét hoàn tất. Tìm thấy 17 file.
+2025-12-26 09:57:50 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-26 09:58:08 - INFO - Bắt đầu quét: DEEP trên \\.\H: (NTFS)
+2025-12-26 10:00:03 - INFO - Quá trình quét hoàn tất. Tìm thấy 4967 file.
+2025-12-26 10:52:43 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-26 10:53:05 - INFO - Bắt đầu quét: QUICK trên \\.\D: (NTFS)
+2025-12-26 10:54:15 - INFO - Quá trình quét hoàn tất. Tìm thấy 571 file.
+2025-12-26 12:29:33 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-26 12:57:27 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-26 12:59:42 - INFO - Bắt đầu quét: QUICK trên \\.\F: (FAT32)
+2025-12-26 12:59:42 - INFO - Quá trình quét hoàn tất. Tìm thấy 571 file.
+2025-12-26 12:59:48 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-26 13:00:03 - INFO - Bắt đầu quét: QUICK trên \\.\F: (FAT32)
+2025-12-26 13:00:03 - INFO - Quá trình quét hoàn tất. Tìm thấy 0 file.
+2025-12-26 13:00:23 - INFO - Bắt đầu quét: QUICK trên \\.\F: (FAT32)
+2025-12-26 13:00:25 - INFO - Quá trình quét hoàn tất. Tìm thấy 9 file.
+2025-12-26 13:38:00 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-26 14:22:42 - INFO - Bắt đầu quét: QUICK trên \\.\F: (EXFAT)
+2025-12-26 14:22:42 - INFO - Quá trình quét hoàn tất. Tìm thấy 0 file.
+2025-12-26 14:24:59 - INFO - Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)
+2025-12-26 14:25:03 - INFO - Bắt đầu quét: DEEP trên \\.\F: (EXFAT)
+2025-12-26 14:26:49 - INFO - Quá trình quét hoàn tất. Tìm thấy 5266 file.
+2025-12-26 14:27:18 - INFO - Đang khôi phục file: jpg_10936790.jpg -> C:/jpg_10936790.jpg
+2025-12-26 14:27:20 - INFO - Thành công: Copy từ file tạm (jpg_10936790.jpg)

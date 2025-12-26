@@ -136,8 +136,8 @@ def check_file_status(f, start_cluster, size, bpb, lay):
         return "Partially Recoverable"
 
 # === COUNT TOTAL ENTRIES PHASE (ĐỆ QUY) ===
+# === COUNT TOTAL ENTRIES PHASE (ĐỆ QUY) ===
 def count_entries(f, cluster, bpb, lay, visited=None):
-    """Đệ quy đếm tổng số entry (dùng để xác định denominator của progress)."""
     if visited is None:
         visited = set()
     try:
@@ -151,8 +151,8 @@ def count_entries(f, cluster, bpb, lay, visited=None):
     entries = parse_directory_entries(data)
     total = len(entries)
     for e in entries:
-        # nếu là thư mục (attr bit 0x10), chưa xóa, có cluster -> đệ quy
-        if (e["attr"] & 0x10) and not e["deleted"] and e["cluster"] > 1:
+        # [SỬA] Cho phép đếm cả trong thư mục ĐÃ XÓA (miễn là là thư mục và có cluster hợp lệ)
+        if (e["attr"] & 0x10) and e["cluster"] > 1:
             total += count_entries(f, e["cluster"], bpb, lay, visited)
     return total
 
@@ -242,8 +242,8 @@ def scan_directory(f, cluster, bpb, lay, path="", progress_obj=None, visited=Non
             }
             results.append(enriched_entry)
 
-        # nếu là thư mục con, đệ quy
-        if (e["attr"] & 0x10) and not e["deleted"] and e["cluster"] > 1:
+        if (e["attr"] & 0x10) and e["cluster"] > 1:
+            # Nếu là thư mục xóa, tên file sẽ có dấu ? hoặc ký tự lạ, nhưng vẫn scan được bên trong
             results.extend(scan_directory(f, e["cluster"], bpb, lay, fullpath, progress_obj, visited))
 
     return results

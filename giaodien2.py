@@ -1,11 +1,11 @@
-# giaodien2.py (Đã tối ưu hóa logic sắp xếp và Thêm Khôi phục Tất cả) 
+# giaodien2.py (Đã tối ưu hóa logic sắp xếp và Thêm Khôi phục Tất cả)  
 from PyQt5.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, 
     QFrame, QTableWidget, QHeaderView, QMessageBox, QLineEdit,
     QTableWidgetItem, QAbstractItemView, QFileDialog, QGraphicsDropShadowEffect, QScrollArea,
     QApplication, QDialog, QProgressBar, QMainWindow, QDockWidget # <-- THÊM MỚI
 )
-from PyQt5.QtWidgets import QStackedWidget, QTextEdit
+from PyQt5.QtWidgets import QStackedWidget, QTextEdit, QPlainTextEdit, QDialogButtonBox
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QDateTime
 from PyQt5.QtGui import QFont, QPixmap, QImage, QColor
 from dashboard import DashboardWidget
@@ -31,7 +31,132 @@ def log_action(message, level="info"):
     elif level == "error": logging.error(message)
     elif level == "warning": logging.warning(message)
     print(f"[{level.upper()}] {message}") # Vẫn in ra màn hình console để debug
-# (Giữ nguyên DropShadowEffect và NumericItem)
+
+class HexViewerDialog(QDialog):
+    def __init__(self, data, start_offset=0, title="Hex Viewer", parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.resize(950, 600)
+        self.setWindowFlags(self.windowFlags() | Qt.WindowMaximizeButtonHint)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(10, 10, 10, 10)
+
+        # Hướng dẫn
+        lbl_hint = QLabel(f"Đang hiển thị {len(data):,} bytes (Preview). Offset bắt đầu: {start_offset:08X}h")
+        lbl_hint.setStyleSheet("color: #555; font-weight: bold;")
+        layout.addWidget(lbl_hint)
+
+        # --- THIẾT LẬP BẢNG ---
+        self.table = QTableWidget()
+        self.table.setColumnCount(3) # 3 Cột: Offset | Hex | ASCII
+        self.table.setHorizontalHeaderLabels(["Offset (Hex)", "Hex Bytes (00 - 0F)", "ASCII Decode"])
+        
+        # Ẩn số thứ tự dòng bên trái (Vertical Header)
+        self.table.verticalHeader().setVisible(False)
+        # Không cho sửa
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        # Chọn từng dòng
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # Tắt Grid nét đứt mặc định, dùng style riêng
+        self.table.setShowGrid(False)
+        
+        # Style cho bảng nhìn giống phần mềm chuyên nghiệp (FTK/HxD style)
+        self.table.setStyleSheet("""
+            QTableWidget {
+                background-color: #ffffff;
+                font-family: 'Consolas', 'Courier New', monospace;
+                font-size: 11pt;
+                border: 1px solid #d0d0d0;
+            }
+            QTableWidget::item {
+                padding-left: 10px;
+                border-bottom: 1px solid #f0f0f0; /* Kẻ ngang mờ */
+            }
+            QTableWidget::item:selected {
+                background-color: #0078d7;
+                color: white;
+            }
+            QHeaderView::section {
+                background-color: #f5f5f5;
+                padding: 5px;
+                border: 1px solid #d0d0d0;
+                font-weight: bold;
+                font-family: 'Segoe UI';
+            }
+        """)
+
+        # Cấu hình độ rộng cột
+        header = self.table.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.Fixed) # Offset cố định
+        self.table.setColumnWidth(0, 110) # Rộng hơn xíu cho đẹp
+        
+        header.setSectionResizeMode(1, QHeaderView.Stretch) # Hex giãn hết cỡ
+        
+        header.setSectionResizeMode(2, QHeaderView.Fixed) # ASCII cố định
+        self.table.setColumnWidth(2, 220)
+
+        layout.addWidget(self.table)
+
+        # Nút Đóng
+        buttons = QDialogButtonBox(QDialogButtonBox.Close)
+        buttons.rejected.connect(self.close)
+        layout.addWidget(buttons)
+
+        # Load dữ liệu với Offset chuẩn
+        self.load_hex_table(data, start_offset)
+
+    def load_hex_table(self, data, start_offset):
+        if not data:
+            return
+
+        chunk_size = 16
+        # Tính tổng số dòng cần thiết
+        total_rows = (len(data) + chunk_size - 1) // chunk_size
+        self.table.setRowCount(total_rows)
+
+        # Font Monospace cho dữ liệu (bắt buộc để thẳng hàng số)
+        mono_font = QFont("Consolas")
+        mono_font.setStyleHint(QFont.Monospace)
+
+        for row, i in enumerate(range(0, len(data), chunk_size)):
+            chunk = data[i:i + chunk_size]
+
+            # 1. Cột Offset: Cộng thêm start_offset để hiển thị đúng vị trí trên đĩa
+            current_offset = start_offset + i
+            offset_str = f"{current_offset:08X}"
+            
+            item_offset = QTableWidgetItem(offset_str)
+            item_offset.setForeground(QColor("#003366")) # Màu xanh đậm
+            item_offset.setFont(mono_font)
+            item_offset.setTextAlignment(Qt.AlignCenter)
+            self.table.setItem(row, 0, item_offset)
+
+            # 2. Cột Hex (Chia làm 2 nhóm 8-8)
+            hex_part1 = " ".join(f"{b:02X}" for b in chunk[:8])
+            hex_part2 = " ".join(f"{b:02X}" for b in chunk[8:])
+            
+            # Thêm khoảng trắng lớn ở giữa 2 nhóm để dễ nhìn
+            hex_full = f"{hex_part1}    {hex_part2}" 
+            
+            item_hex = QTableWidgetItem(hex_full)
+            item_hex.setFont(mono_font)
+            item_hex.setForeground(QColor("#222222")) # Màu đen nhạt
+            self.table.setItem(row, 1, item_hex)
+
+            # 3. Cột ASCII (Màu đỏ sẫm)
+            ascii_str = ""
+            for b in chunk:
+                # Chỉ hiện ký tự in được (từ 32 đến 126), còn lại là dấu chấm
+                if 32 <= b <= 126:
+                    ascii_str += chr(b)
+                else:
+                    ascii_str += "."
+            
+            item_ascii = QTableWidgetItem(ascii_str)
+            item_ascii.setFont(mono_font)
+            item_ascii.setForeground(QColor("#800000")) # Màu đỏ sẫm
+            self.table.setItem(row, 2, item_ascii)
 class DropShadowEffect(QGraphicsDropShadowEffect):
     def __init__(self, color=QColor(0, 0, 0, 80), blur_radius=15, x_offset=0, y_offset=6):
         super().__init__()
@@ -231,15 +356,15 @@ class ScanProgressWindow(QDialog):
         # Để nút Phóng to hoạt động, cửa sổ phải co giãn được
         self.resize(400, 150) 
         self.setMinimumWidth(300) # Đặt chiều rộng tối thiểu để không bị quá bé
-        
         self.setObjectName("ScanProgressWindow") 
         
         # --- [SỬA 2] Thêm nút Phóng to (Maximize) ---
         self.setWindowFlags(
-            Qt.Window | 
+            Qt.Dialog | 
             Qt.WindowMinimizeButtonHint | 
             Qt.WindowMaximizeButtonHint | # <--- Thêm dòng này
-            Qt.WindowCloseButtonHint
+            Qt.WindowCloseButtonHint |
+            Qt.WindowStaysOnTopHint
         )
 
         layout = QVBoxLayout(self)
@@ -332,7 +457,12 @@ class DetailPreviewPanel(QFrame):
 
         detail_scroll.setWidget(detail_content_container)
         right_layout.addWidget(detail_scroll)
-
+        # [MỚI] Nút xem Hex
+        self.hex_btn = QPushButton("🔢 Xem mã Hex")
+        self.hex_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4))
+        self.hex_btn.setFixedHeight(40)
+        self.hex_btn.setObjectName("hexBtn")
+        right_layout.addWidget(self.hex_btn)
         self.recover_btn = QPushButton("Khôi phục file")
         self.recover_btn.setObjectName("recoverBtn")
         self.recover_btn.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4)) 
@@ -496,7 +626,8 @@ class RecoverDeletedApp(QMainWindow):
         # Kết nối sự kiện
         self.table.currentCellChanged.connect(self.handle_cell_change)
         self.detail_panel.recover_btn.clicked.connect(self.recover_file)
-        
+        self.detail_panel.hex_btn.clicked.connect(self.show_hex_viewer)
+
     def setup_side_bar(self, parent_layout):
         """Tạo thanh sidebar bên trái."""
         side_bar = QVBoxLayout()
@@ -533,7 +664,7 @@ class RecoverDeletedApp(QMainWindow):
         # Nút 1: Xem Bảng (Quay về Index 0)
         self.btn_view_list = QPushButton("📄 Danh sách File")
         self.btn_view_list.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4))
-        self.btn_view_list.setFixedHeight(35)
+        self.btn_view_list.setFixedHeight(40)
         # Bấm vào thì hiện Stack trang 0
         self.btn_view_list.clicked.connect(lambda: self.stack.setCurrentIndex(0))
         side_bar.addWidget(self.btn_view_list)
@@ -541,7 +672,7 @@ class RecoverDeletedApp(QMainWindow):
         # Nút 2: Xem Dashboard (Sang Index 1)
         self.btn_view_dash = QPushButton("📊 Dashboard")
         self.btn_view_dash.setGraphicsEffect(DropShadowEffect(blur_radius=10, y_offset=4))
-        self.btn_view_dash.setFixedHeight(35)
+        self.btn_view_dash.setFixedHeight(40)
         # Bấm vào thì gọi hàm show_dashboard
         self.btn_view_dash.clicked.connect(self.show_dashboard)
         side_bar.addWidget(self.btn_view_dash)
@@ -631,7 +762,6 @@ class RecoverDeletedApp(QMainWindow):
         
         parent_layout.addWidget(table_container)
     
-  # --- [SỬA] THAY THẾ 3 HÀM NÀY ---
     def start_scan(self):
         self.status_label.setText("🔍 Đang khởi tạo quét...")
         self.table.setSortingEnabled(False) 
@@ -784,7 +914,76 @@ class RecoverDeletedApp(QMainWindow):
 
         self.detail_panel.update_details(chi_tiet)
         self.detail_panel.update_preview(chi_tiet, image_path)
+    
+    def show_hex_viewer(self):
+        chi_tiet = self.detail_panel.recover_btn.property("current_file")
+        if not chi_tiet:
+            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn một file để xem Hex.")
+            return
+
+        file_name = chi_tiet.get("name", "Unknown")
+        temp_path = chi_tiet.get("temp_path") or os.path.join("recovered_files", file_name)
         
+        # [SỬA] Lấy Offset chuẩn của file
+        file_offset = get_best_offset(chi_tiet)
+        
+        # Nếu đọc từ file tạm (đã recover rồi), offset bắt đầu từ 0 của file đó
+        # Nếu đọc từ ổ đĩa (raw disk), offset là vị trí thực trên ổ đĩa
+        
+        data = b""
+        display_offset = 0 # Mặc định là 0 nếu đọc file tạm
+
+        if os.path.exists(temp_path):
+            try:
+                # Đọc 16KB đầu từ file tạm
+                with open(temp_path, "rb") as f: 
+                    data = f.read(16 * 1024)
+                # Khi xem file tạm, offset hiển thị là 0 (đầu file)
+                display_offset = 0 
+            except Exception as e:
+                print(f"Lỗi đọc file tạm: {e}")
+
+        # Nếu không có file tạm, đọc trực tiếp từ Image/Disk
+        if not data:
+            image_path = self.target_info.get("path") if self.target_info else None
+            if image_path:
+                # Đọc raw từ disk
+                data = read_file_from_image(image_path, file_offset, size=4096, max_preview=4096)
+                # Khi xem raw disk, offset hiển thị là vị trí thực trên ổ đĩa
+                display_offset = file_offset
+
+        if not data:
+            QMessageBox.warning(self, "Trống", "Không đọc được dữ liệu để hiển thị Hex.")
+            return
+
+        # [SỬA] Truyền display_offset vào Dialog
+        viewer = HexViewerDialog(data, start_offset=display_offset, title=f"Hex View: {file_name}", parent=self)
+        viewer.exec_()
+
+    def is_safe_to_save(self, save_path):
+        """Kiểm tra xem đường dẫn lưu có nằm trên ổ đĩa nguồn không."""
+        source_path = self.target_info.get("path", "")
+        if not source_path or not save_path: 
+            return True # Không xác định được thì cho qua (hoặc chặn tùy bạn)
+
+        # Lấy ký tự ổ đĩa (VD: "E")
+        src_drive = ""
+        dest_drive = ""
+
+        # Xử lý nguồn (Windows style: E: hoặc \\.\E:)
+        if ":" in source_path:
+            src_drive = source_path.split(":")[0][-1].upper()
+        
+        # Xử lý đích
+        abs_save = os.path.abspath(save_path)
+        if ":" in abs_save:
+            dest_drive = abs_save.split(":")[0].upper()
+
+        # So sánh ký tự ổ đĩa
+        if src_drive and dest_drive and src_drive == dest_drive:
+            return False
+        return True    
+  
     def recover_file(self):
         chi_tiet = self.detail_panel.recover_btn.property("current_file")
         if not chi_tiet:
@@ -799,7 +998,14 @@ class RecoverDeletedApp(QMainWindow):
         )
         if not save_path:
             return
-
+        if not self.is_safe_to_save(save_path):
+            QMessageBox.critical(
+                self, "Lỗi nghiêm trọng",
+                "Không thể lưu file khôi phục trên cùng ổ đĩa với ổ nguồn (target). "
+                "Vui lòng chọn ổ đĩa khác để đảm bảo an toàn dữ liệu."
+            )
+            log_action(f"Thất bại khi khôi phục {file_name}: Cố gắng lưu trên cùng ổ đĩa với nguồn", "error") # <--- Thêm dòng này
+            return
         try:
             log_action(f"Đang khôi phục file: {file_name} -> {save_path}") # <--- Thêm dòng này
             if os.path.exists(temp_path):
@@ -841,7 +1047,14 @@ class RecoverDeletedApp(QMainWindow):
         )
         if not save_dir:
             return
-
+        if not self.is_safe_to_save(save_dir):
+            QMessageBox.critical(
+                self, "Lỗi nghiêm trọng",
+                "Không thể lưu file khôi phục trên cùng ổ đĩa với ổ nguồn (target). "
+                "Vui lòng chọn ổ đĩa khác để đảm bảo an toàn dữ liệu."
+            )
+            log_action(f"Thất bại khi khôi phục tất cả: Cố gắng lưu trên cùng ổ đĩa với nguồn", "error") # <--- Thêm dòng này
+            return
         # Kiểm tra xem có cần image_path không và có image_path không
         image_path = self.target_info.get("path") if self.target_info else None
         needs_image_path = False
@@ -918,6 +1131,7 @@ class RecoverDeletedApp(QMainWindow):
                               f"Thất bại: {fail_count}\n\n"
                               f"File được lưu tại: {save_dir}")
         log_action(f"Kết thúc khôi phục hàng loạt. Thành công: {success_count}, Lỗi: {fail_count}") # <--- Thêm dòng này
+   
     def filter_table(self, text):
         text = text.strip().lower()
         for row in range(self.table.rowCount()):
@@ -1051,7 +1265,6 @@ class RecoverDeletedApp(QMainWindow):
 
         self.home_requested.emit()
     
-   # ... (Trong class RecoverDeletedApp) ...
     def cleanup_recovered_files(self):
         temp_dir = "recovered_files"
         if not os.path.exists(temp_dir):
@@ -1065,6 +1278,7 @@ class RecoverDeletedApp(QMainWindow):
             log_action("Đã dọn dẹp thư mục recovered_files/ (Xóa file tạm)") # <--- Thay print bằng log_action
         except Exception as e:
             log_action(f"Lỗi dọn dẹp file tạm: {e}", "error") #
+ 
     def show_dashboard(self):
         """Hiển thị Dashboard và kết nối sự kiện click"""
         self.stack.setCurrentIndex(1)
@@ -1082,20 +1296,20 @@ class RecoverDeletedApp(QMainWindow):
             self.dashboard_layout_container.addWidget(dashboard, 1) 
         except Exception as e:
             self.dashboard_layout_container.addWidget(QLabel(f"Lỗi: {e}"))
-
-
+            
     def handle_dashboard_filter(self, category):
-     
-        print(f"User selected category: {category}") # Debug
+        print(f"User selected category: {category}") 
         
         # 1. Chuyển về trang danh sách file (Index 0)
         self.stack.setCurrentIndex(0)
         
-        # 2. Reset ô tìm kiếm
-        self.search_box.clear()
-        self.search_box.setText(category) 
+        # 2. Xử lý ô tìm kiếm (FIX LỖI TẠI ĐÂY)
+        self.search_box.blockSignals(True)   # Tạm khóa tín hiệu để không kích hoạt tìm kiếm text
+        self.search_box.clear()              # Xóa chữ trong ô tìm kiếm (ví dụ xóa chữ "Other")
+        self.search_box.setPlaceholderText(f"🔍 Đang lọc danh mục: {category}...") # Hiển thị thông báo mờ
+        self.search_box.blockSignals(False)  # Mở lại tín hiệu
         
-        # Nếu bạn muốn filter CHÍNH XÁC theo cột Loại (Cột 1), hãy sửa hàm filter_table:
+        # 3. Gọi hàm lọc chuyên dụng theo đuôi file
         self.filter_table_by_type(category)
 
     def filter_table_by_type(self, category):
@@ -1126,7 +1340,6 @@ class RecoverDeletedApp(QMainWindow):
             else:
                 # Nếu thuộc danh sách đuôi file của nhóm đó
                 if file_type in target_exts: should_show = True
-            
             self.table.setRowHidden(row, not should_show)
                
     def closeEvent(self, event):
@@ -1141,11 +1354,8 @@ class RecoverDeletedApp(QMainWindow):
             if reply == QMessageBox.No:
                 event.ignore()
                 return
-
             self.worker.stop()
             self.worker.wait()
-
         # ✅ THOÁT LÀ XÓA FILE TẠM
         self.cleanup_recovered_files()
-
         event.accept()

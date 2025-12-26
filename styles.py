@@ -70,12 +70,12 @@ def get_app_stylesheet():
     }
 
     /* Nút riêng (Override) */
-    #scanBtn, #openSessionBtn { /* Áp dụng cho cả scanBtn và openSessionBtn */
+    #scanBtn, #openSessionBtn, #hexBtn { /* Áp dụng cho cả scanBtn và openSessionBtn */
         background-color: #2563eb;
         color: white;
         font-weight: bold;
     }
-    #scanBtn:hover, #openSessionBtn:hover {
+    #scanBtn:hover, #openSessionBtn:hover, #hexBtn:hover {
         background-color: #1e40af;
     }
 
@@ -111,7 +111,10 @@ def get_app_stylesheet():
     font-size: 20px;
     font-weight: bold;
     }
-
+ 
+    #hexBtn {
+        border-radius: 8px;
+    }
     #recoverBtn:hover {
         background-color: #1976d2;
     }

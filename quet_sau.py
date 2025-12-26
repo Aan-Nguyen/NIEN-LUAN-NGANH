@@ -244,5 +244,5 @@ if __name__ == "__main__":
         print("Usage: python quet_sau.py <path> [GB]")
     else:
         drive = sys.argv[1]
-        size = float(sys.argv[2]) if len(sys.argv) > 2 else 1
+        size = float(sys.argv[2]) if len(sys.argv) > 2 else 2
         carve_unified(drive, max_scan_gb=size)
